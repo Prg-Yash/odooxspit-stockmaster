@@ -116,11 +116,6 @@ const menuSections: MenuSection[] = [
         url: "/dashboard/receipts",
         icon: Receipt,
       },
-      {
-        title: "Generate Receipt",
-        url: "/dashboard/generate-receipt",
-        icon: PackagePlus,
-      },
     ],
   },
   {
@@ -134,10 +129,6 @@ const menuSections: MenuSection[] = [
           {
             title: "All Products",
             url: "/dashboard/products",
-          },
-          {
-            title: "Create Product",
-            url: "/dashboard/products/create",
           },
         ],
       },
@@ -258,24 +249,11 @@ const RegularMenuItem = ({ item, isActive }: {
 )
 
 const useAuthHook = () => {
-  const router = useRouter()
-  const [user, setUser] = React.useState<any>(null)
-
-  React.useEffect(() => {
-    const userData = localStorage.getItem("user")
-    if (userData) {
-      try {
-        setUser(JSON.parse(userData))
-      } catch {
-        setUser(null)
-      }
-    }
-  }, [])
-
-  const logout = React.useCallback(() => {
-    localStorage.removeItem("user")
-    router.push("/login")
-  }, [router])
+  // Mock auth hook, no real auth
+  const user = { name: "Demo User", email: "demo@example.com", role: "owner" as const }
+  const logout = () => {
+    console.log("Mock logout")
+  }
 
   return { user, logout }
 }

@@ -5,20 +5,17 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { useAuth } from "@/lib/auth-context"
 import { Building2, Mail, Phone, MapPin } from "lucide-react"
 
 export default function CompanyPage() {
-  const { user } = useAuth()
-
-  if (!user || user.role !== "owner") {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <p className="text-muted-foreground">You don&apos;t have permission to view this page.</p>
-        </div>
-      </div>
-    )
+  // Mock page, no auth
+  const mockCompany = {
+    name: "Demo Company",
+    email: "company@example.com",
+    phone: "+1 (555) 123-4567",
+    address: "123 Business St",
+    city: "New York",
+    country: "USA"
   }
 
   return (
@@ -47,7 +44,7 @@ export default function CompanyPage() {
                   <Building2 className="h-4 w-4 text-muted-foreground" />
                   <Input
                     id="companyName"
-                    defaultValue={user.company.name}
+                    defaultValue={mockCompany.name}
                     disabled
                   />
                 </div>
@@ -59,7 +56,7 @@ export default function CompanyPage() {
                   <Input
                     id="companyEmail"
                     type="email"
-                    defaultValue={user.company.email}
+                    defaultValue={mockCompany.email}
                     disabled
                   />
                 </div>
@@ -72,7 +69,7 @@ export default function CompanyPage() {
                 <Phone className="h-4 w-4 text-muted-foreground" />
                 <Input
                   id="phone"
-                  defaultValue={user.company.phone}
+                  defaultValue={mockCompany.phone}
                   disabled
                 />
               </div>
@@ -84,7 +81,7 @@ export default function CompanyPage() {
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 <Input
                   id="address"
-                  defaultValue={user.company.address}
+                  defaultValue={mockCompany.address}
                   disabled
                 />
               </div>
@@ -95,7 +92,7 @@ export default function CompanyPage() {
                 <Label htmlFor="city">City</Label>
                 <Input
                   id="city"
-                  defaultValue={user.company.city}
+                  defaultValue={mockCompany.city}
                   disabled
                 />
               </div>
@@ -103,7 +100,7 @@ export default function CompanyPage() {
                 <Label htmlFor="country">Country</Label>
                 <Input
                   id="country"
-                  defaultValue={user.company.country}
+                  defaultValue={mockCompany.country}
                   disabled
                 />
               </div>

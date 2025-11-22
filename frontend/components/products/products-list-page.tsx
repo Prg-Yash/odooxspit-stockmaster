@@ -17,12 +17,8 @@ interface ProductsListPageProps {
 export function ProductsListPage({ products, onEditProduct, onViewProduct }: ProductsListPageProps) {
 	return (
 		<div className="space-y-6 animate-fade-in">
-			<div className="flex flex-wrap gap-2 mb-4">
+			<div className="flex  flex-wrap gap-2 mb-4 justify-end">
 				<ProductCreateDialog />
-				<InventoryUpdateDialog />
-				<ReceiptGenerateDialog />
-				<LocationCreateDialog />
-				<MoveHistoryDialog />
 			</div>
 			<div className="overflow-x-auto border rounded-lg">
 				<table className="w-full text-sm">

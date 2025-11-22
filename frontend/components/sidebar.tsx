@@ -31,8 +31,9 @@ export function Sidebar({ currentPage, onPageChange, onLogout }: SidebarProps) {
     { id: "warehouse", label: "Warehouses", icon: Building2 },
     { id: "warehouse-locations", label: "Warehouse Locations", icon: TrendingUp },
     { id: "vendors", label: "Vendors", icon: Users },
-    { id: "moves", label: "Move History", icon: TrendingUp },
-    { id: "move-history", label: "Recent Moves", icon: History },
+    { id: "employees", label: "Employees", icon: Users },
+    { id: "moves", label: "Stock Moves", icon: TrendingUp },
+    { id: "move-history", label: "Move History", icon: History },
     { id: "receipts", label: "Receipts", icon: Receipt },
   ]
 
