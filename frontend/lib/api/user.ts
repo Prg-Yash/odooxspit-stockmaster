@@ -43,3 +43,20 @@ export async function getCurrentUser() {
     '/user/me'
   );
 }
+
+export interface UpdateProfileData {
+  name?: string
+  email?: string
+  password?: string
+  currentPassword?: string
+}
+
+/**
+ * Update user profile (name, email, or password)
+ */
+export async function updateProfile(data: UpdateProfileData) {
+  return api.put<ApiResponse<{ user: User }>>(
+    '/user/update',
+    data
+  );
+}

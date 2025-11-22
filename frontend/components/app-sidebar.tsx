@@ -249,10 +249,27 @@ const RegularMenuItem = ({ item, isActive }: {
 )
 
 const useAuthHook = () => {
-  // Mock auth hook, no real auth
-  const user = { name: "Demo User", email: "demo@example.com", role: "owner" as const }
+  const router = useRouter()
+  const [user, setUser] = React.useState<any>(null)
+
+  React.useEffect(() => {
+    const userData = localStorage.getItem("user")
+    if (userData) {
+      setUser(JSON.parse(userData))
+    }
+  }, [])
+
   const logout = () => {
-    console.log("Mock logout")
+    // Clear localStorage
+    localStorage.removeItem("user")
+    localStorage.removeItem("devAccessToken")
+    
+    // Clear cookies by setting them to expire
+    document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+    document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+    
+    // Redirect to login
+    router.push("/login")
   }
 
   return { user, logout }
