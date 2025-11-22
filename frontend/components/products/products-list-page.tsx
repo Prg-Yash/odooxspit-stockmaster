@@ -1,115 +1,64 @@
 "use client"
-import { useState } from "react"
+import { Product } from "@/types"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Plus, Edit2, Trash2, Search, Eye } from "lucide-react"
-import type { Product } from "@/app/page"
+import { Eye, Edit2, Trash2 } from "lucide-react"
+import { ProductCreateDialog } from "@/components/dialogs/product-create-dialog"
+import { InventoryUpdateDialog } from "@/components/dialogs/inventory-update-dialog"
+import { ReceiptGenerateDialog } from "@/components/dialogs/receipt-generate-dialog"
+import { LocationCreateDialog } from "@/components/dialogs/location-create-dialog"
+import { MoveHistoryDialog } from "@/components/dialogs/move-history-dialog"
 
 interface ProductsListPageProps {
-  products: Product[]
-  onEditProduct: (id: string) => void
-  onViewProduct: (id: string) => void
+	products: Product[]
+	onEditProduct: (id: string) => void
+	onViewProduct: (id: string) => void
 }
 
 export function ProductsListPage({ products, onEditProduct, onViewProduct }: ProductsListPageProps) {
-  const [searchQuery, setSearchQuery] = useState("")
-
-  const filteredProducts = products.filter(
-    (p) =>
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.sku.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
-
-  return (
-    <div className="space-y-4 md:space-y-6 animate-fade-in">
-      {/* Header with Actions */}
-      <div className="flex flex-col sm:flex-row gap-3 md:gap-4 items-stretch sm:items-center justify-between">
-        <div className="relative flex-1 sm:flex-none sm:w-96">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
-          <Input
-            placeholder="Search products..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 border-2"
-          />
-        </div>
-        <Button
-          onClick={() => (window.location.pathname = "/")}
-          className="bg-accent hover:bg-accent/90 text-accent-foreground gap-2 whitespace-nowrap w-full sm:w-auto"
-        >
-          <Plus size={18} /> Create Product
-        </Button>
-      </div>
-
-      {/* Products Table */}
-      <Card className="border-2">
-        <CardHeader>
-          <CardTitle className="text-base md:text-lg">Products ({filteredProducts.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs md:text-sm">
-              <thead>
-                <tr className="border-b-2 border-border">
-                  <th className="text-left py-2 md:py-3 px-2 md:px-4 font-semibold text-foreground">Product</th>
-                  <th className="text-left py-2 md:py-3 px-2 md:px-4 font-semibold text-foreground">SKU</th>
-                  <th className="text-left py-2 md:py-3 px-2 md:px-4 font-semibold text-foreground hidden md:table-cell">
-                    Category
-                  </th>
-                  <th className="text-right py-2 md:py-3 px-2 md:px-4 font-semibold text-foreground hidden lg:table-cell">
-                    Price
-                  </th>
-                  <th className="text-center py-2 md:py-3 px-2 md:px-4 font-semibold text-foreground">Qty</th>
-                  <th className="text-center py-2 md:py-3 px-2 md:px-4 font-semibold text-foreground">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredProducts.map((product) => (
-                  <tr key={product.id} className="border-b border-border hover:bg-secondary/50 transition-colors">
-                    <td className="py-2 md:py-3 px-2 md:px-4 text-foreground font-medium truncate">{product.name}</td>
-                    <td className="py-2 md:py-3 px-2 md:px-4 text-muted-foreground text-xs md:text-sm">
-                      {product.sku}
-                    </td>
-                    <td className="py-2 md:py-3 px-2 md:px-4 text-muted-foreground hidden md:table-cell text-xs">
-                      {product.category}
-                    </td>
-                    <td className="py-2 md:py-3 px-2 md:px-4 text-right text-foreground hidden lg:table-cell">
-                      ${product.price.toFixed(2)}
-                    </td>
-                    <td className="py-2 md:py-3 px-2 md:px-4 text-center">
-                      <span className="inline-block px-2 md:px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
-                        {product.quantity}
-                      </span>
-                    </td>
-                    <td className="py-2 md:py-3 px-2 md:px-4 text-center">
-                      <div className="flex gap-1 justify-center flex-wrap">
-                        <button
-                          onClick={() => onViewProduct(product.id)}
-                          className="p-1 hover:bg-primary/10 rounded transition-colors"
-                          title="View"
-                        >
-                          <Eye size={16} className="text-primary" />
-                        </button>
-                        <button
-                          onClick={() => onEditProduct(product.id)}
-                          className="p-1 hover:bg-primary/10 rounded transition-colors"
-                          title="Edit"
-                        >
-                          <Edit2 size={16} className="text-primary" />
-                        </button>
-                        <button className="p-1 hover:bg-destructive/10 rounded transition-colors" title="Delete">
-                          <Trash2 size={16} className="text-destructive" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
+	return (
+		<div className="space-y-6 animate-fade-in">
+			<div className="flex  flex-wrap gap-2 mb-4 justify-end">
+				<ProductCreateDialog />
+			</div>
+			<div className="overflow-x-auto border rounded-lg">
+				<table className="w-full text-sm">
+					<thead>
+						<tr className="border-b">
+							<th className="text-left p-2">Product</th>
+							<th className="text-left p-2">SKU</th>
+							<th className="text-left p-2">Category</th>
+							<th className="text-right p-2">Price</th>
+							<th className="text-center p-2">Qty</th>
+							<th className="text-center p-2">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{products.map((product) => (
+							<tr key={product.id} className="border-b hover:bg-secondary/50">
+								<td className="p-2 font-medium">{product.name}</td>
+								<td className="p-2 text-muted-foreground">{product.sku}</td>
+								<td className="p-2 text-muted-foreground">{product.category}</td>
+								<td className="p-2 text-right">${product.price.toFixed(2)}</td>
+								<td className="p-2 text-center">{product.quantity}</td>
+								<td className="p-2 text-center">
+									<div className="flex gap-1 justify-center">
+										<Button size="icon" variant="ghost" onClick={() => onViewProduct(product.id)} title="View">
+											<Eye size={16} />
+										</Button>
+										<Button size="icon" variant="ghost" onClick={() => onEditProduct(product.id)} title="Edit">
+											<Edit2 size={16} />
+										</Button>
+										<Button size="icon" variant="ghost" title="Delete">
+											<Trash2 size={16} />
+										</Button>
+									</div>
+								</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	)
 }
+

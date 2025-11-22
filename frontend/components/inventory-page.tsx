@@ -2,9 +2,10 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { InventoryUpdateDialog } from "@/components/dialogs/inventory-update-dialog"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AlertTriangle, Plus } from "lucide-react"
-import type { Product, Warehouse } from "@/app/page"
+import type { Product, Warehouse } from "@/types"
 
 interface InventoryItem {
   id: string
@@ -82,7 +83,7 @@ export function InventoryPage({ products, warehouses }: InventoryPageProps) {
       {/* Alert Banner for Low Stock */}
       {criticalCount > 0 && (
         <div className="bg-destructive/10 border-2 border-destructive rounded-lg p-3 md:p-4 flex items-start gap-3">
-          <AlertTriangle className="text-destructive flex-shrink-0 mt-0.5 md:mt-1" size={20} />
+          <AlertTriangle className="text-destructive shrink-0 mt-0.5 md:mt-1" size={20} />
           <div>
             <h3 className="font-semibold text-destructive text-sm md:text-base">Low Stock Alert</h3>
             <p className="text-xs md:text-sm text-destructive/80">
@@ -106,9 +107,7 @@ export function InventoryPage({ products, warehouses }: InventoryPageProps) {
             </Button>
           ))}
         </div>
-        <Button className="bg-accent hover:bg-accent/90 text-accent-foreground gap-2 whitespace-nowrap w-full sm:w-auto text-sm md:text-base">
-          <Plus size={18} /> Update Stock
-        </Button>
+        <InventoryUpdateDialog />
       </div>
 
       {/* Inventory Table */}

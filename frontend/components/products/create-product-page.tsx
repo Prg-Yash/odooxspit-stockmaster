@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft } from "lucide-react"
-import type { Product } from "@/app/page"
+import type { Product } from "@/types"
 
 interface CreateProductPageProps {
   onProductCreate: (product: Product) => void
