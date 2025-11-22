@@ -10,6 +10,12 @@ datasource db {
   provider = "postgresql"
 }
 
+enum UserRole {
+  OWNER
+  MANAGER
+  STAFF
+}
+
 model User {
   id                      String                   @id @default(cuid())
   email                   String                   @unique
@@ -21,6 +27,7 @@ model User {
   refreshTokens           RefreshToken[]
   emailVerificationTokens EmailVerificationToken[]
   passwordResetTokens     PasswordResetToken[]
+  role                    UserRole
 }
 
 model RefreshToken {
