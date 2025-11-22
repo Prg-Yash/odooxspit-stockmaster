@@ -79,8 +79,8 @@ async function register(req: Request, res: Response) {
           data.role === "owner"
             ? UserRole.OWNER
             : data.role === "manager"
-            ? UserRole.MANAGER
-            : UserRole.STAFF,
+              ? UserRole.MANAGER
+              : UserRole.STAFF,
       },
     });
 
