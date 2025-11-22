@@ -67,19 +67,33 @@ export function parseUserAgent(userAgent: string) {
 /**
  * Generate a device name based on device info
  */
-function generateDeviceName(browser: string, os: string, deviceType: string) {
+export function generateDeviceName(
+  browser: string,
+  os: string,
+  deviceType: string
+) {
   return `${browser} on ${os} (${deviceType})`;
 }
 
 /**
  * Get client IP address from request
  */
-export function getClientIp(req: Request) {
-  return (
-    (req.headers["x-forwarded-for"] as string).split(",")[0]?.trim() ||
-    req.headers["x-real-ip"] ||
-    req.socket.remoteAddress ||
-    req.connection.remoteAddress ||
-    "Unknown"
-  );
+export function getClientIp(req: Request): string {
+  const xff = req.headers["x-forwarded-for"];
+  let ip: string | undefined;
+
+  if (typeof xff === "string" && xff.length > 0) {
+    ip = xff.split(",")[0]?.trim();
+  } else if (Array.isArray(xff)) {
+    ip = xff[0];
+  } else if (typeof req.headers["x-real-ip"] === "string") {
+    ip = req.headers["x-real-ip"];
+  } else {
+    ip =
+      req.socket?.remoteAddress ||
+      (req as any).connection?.remoteAddress ||
+      undefined;
+  }
+
+  return ip || "Unknown";
 }
