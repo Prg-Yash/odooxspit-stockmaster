@@ -4,8 +4,9 @@ import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
-import { userRouter } from "./routes/user.route";
+import { authRouter } from "./routes/auth.route";
 import { initializeMailer } from "./lib/mailer";
+import { userRouter } from "./routes/user.route";
 
 const app = express();
 
@@ -53,7 +54,8 @@ app.get("/health", (req, res) => {
 });
 
 // routes
-app.use("/auth", userRouter);
+app.use("/auth", authRouter);
+app.use("/user", userRouter);
 
 // 404 handler
 app.use((req, res) => {
