@@ -4,6 +4,7 @@ import z from "zod";
 export const env = createEnv({
   server: {
     PORT: z.number().default(3001),
+    CORS_ORIGIN: z.string(),
   },
   runtimeEnv: process.env,
 });
