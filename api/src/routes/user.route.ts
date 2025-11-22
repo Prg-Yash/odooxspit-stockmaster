@@ -1,6 +1,6 @@
 import express from "express";
 import { requireAuth } from "~/middlewares/require-auth";
-import { getProfile, updateProfile, deleteAccount, searchUsers } from "~/controllers/user.controller";
+import { getProfile, updateProfile, deleteAccount, searchUsers, getAllEmployees } from "~/controllers/user.controller";
 
 const userRouter = express.Router();
 
@@ -9,6 +9,9 @@ userRouter.use(requireAuth);
 
 // Get current user profile
 userRouter.get("/me", getProfile);
+
+// Get all employees with warehouse assignments (OWNER only)
+userRouter.get("/employees", getAllEmployees);
 
 // Update user profile
 userRouter.put("/update", updateProfile);

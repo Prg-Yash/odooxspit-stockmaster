@@ -10,13 +10,17 @@ export interface User {
   email: string;
   name: string | null;
   role: 'OWNER' | 'MANAGER' | 'STAFF';
+  createdAt?: string;
   warehouseMemberships?: {
+    id: string;
+    role: 'OWNER' | 'MANAGER' | 'STAFF';
     warehouse: {
       id: string;
       name: string;
       code: string;
+      city?: string;
+      state?: string;
     };
-    role: 'MANAGER' | 'STAFF';
   }[];
 }
 
@@ -41,5 +45,14 @@ export async function searchUsers(email: string) {
 export async function getCurrentUser() {
   return api.get<ApiResponse<{ user: User }>>(
     '/user/me'
+  );
+}
+
+/**
+ * Get all employees with warehouse assignments (OWNER only)
+ */
+export async function getAllEmployees() {
+  return api.get<ApiResponse<{ employees: User[] }>>(
+    '/user/employees'
   );
 }

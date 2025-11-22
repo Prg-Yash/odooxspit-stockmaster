@@ -8,6 +8,7 @@ import { api } from '../api-client';
 export interface CreateWarehouseData {
   name: string;
   code: string;
+  capacity?: string;
   address?: string;
   city?: string;
   state?: string;
@@ -19,6 +20,7 @@ export interface Warehouse {
   id: string;
   name: string;
   code: string;
+  capacity?: string;
   address?: string;
   city?: string;
   state?: string;
@@ -31,14 +33,14 @@ export interface Warehouse {
 
 export interface AddMemberData {
   userId: string;
-  role: 'MANAGER' | 'STAFF';
+  role: 'OWNER' | 'MANAGER' | 'STAFF';
 }
 
 export interface WarehouseMember {
   id: string;
   warehouseId: string;
   userId: string;
-  role: 'MANAGER' | 'STAFF';
+  role: 'OWNER' | 'MANAGER' | 'STAFF';
   joinedAt: string;
   user: {
     id: string;

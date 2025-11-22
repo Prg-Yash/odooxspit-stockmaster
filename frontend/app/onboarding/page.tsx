@@ -44,6 +44,7 @@ export default function OnboardingPage() {
   const [warehouseData, setWarehouseData] = useState({
     name: "",
     code: "",
+    capacity: "",
     address: "",
     city: "",
     state: "",
@@ -110,6 +111,7 @@ export default function OnboardingPage() {
       const response = await createWarehouse({
         name: warehouseData.name,
         code: warehouseData.code,
+        capacity: warehouseData.capacity || undefined,
         address: warehouseData.address || undefined,
         city: warehouseData.city || undefined,
         state: warehouseData.state || undefined,
@@ -375,6 +377,24 @@ export default function OnboardingPage() {
                     required
                   />
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="capacity" className="flex items-center gap-2">
+                  <Boxes className="h-4 w-4 text-primary" />
+                  Capacity
+                </Label>
+                <Input
+                  id="capacity"
+                  placeholder="e.g., 10,000 sq ft or 5,000 pallets"
+                  value={warehouseData.capacity}
+                  onChange={(e) =>
+                    setWarehouseData({
+                      ...warehouseData,
+                      capacity: e.target.value,
+                    })
+                  }
+                  className="h-11"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="address" className="flex items-center gap-2">

@@ -5,6 +5,7 @@ import { WarehouseMemberRole } from "../generated/prisma/enums";
 export const createWarehouseSchema = z.object({
     name: z.string().min(1, "Name is required"),
     code: z.string().min(1, "Code is required"),
+    capacity: z.string().optional(),
     address: z.string().optional(),
     city: z.string().optional(),
     state: z.string().optional(),
@@ -14,6 +15,7 @@ export const createWarehouseSchema = z.object({
 
 export const updateWarehouseSchema = z.object({
     name: z.string().min(1).optional(),
+    capacity: z.string().optional(),
     address: z.string().optional(),
     city: z.string().optional(),
     state: z.string().optional(),

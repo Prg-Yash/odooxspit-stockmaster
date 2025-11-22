@@ -1794,6 +1794,7 @@ export const WarehouseScalarFieldEnum = {
   id: 'id',
   name: 'name',
   code: 'code',
+  capacity: 'capacity',
   address: 'address',
   city: 'city',
   state: 'state',
