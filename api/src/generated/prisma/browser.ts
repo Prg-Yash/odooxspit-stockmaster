@@ -77,3 +77,28 @@ export type StockLevel = Prisma.StockLevelModel
  * 
  */
 export type StockMovement = Prisma.StockMovementModel
+/**
+ * Model Vendor
+ * 
+ */
+export type Vendor = Prisma.VendorModel
+/**
+ * Model Receipt
+ * 
+ */
+export type Receipt = Prisma.ReceiptModel
+/**
+ * Model ReceiptItem
+ * 
+ */
+export type ReceiptItem = Prisma.ReceiptItemModel
+/**
+ * Model Delivery
+ * 
+ */
+export type Delivery = Prisma.DeliveryModel
+/**
+ * Model DeliveryItem
+ * 
+ */
+export type DeliveryItem = Prisma.DeliveryItemModel

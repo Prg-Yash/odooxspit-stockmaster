@@ -220,6 +220,17 @@ export class WarehouseController {
             });
         } catch (error: any) {
             console.error("Add member error:", error);
+
+            // Handle specific case where user is in another warehouse
+            if (error.code === "ALREADY_IN_WAREHOUSE") {
+                return res.status(409).json({
+                    success: false,
+                    message: error.message,
+                    code: "ALREADY_IN_WAREHOUSE",
+                    existingWarehouse: error.existingWarehouse,
+                });
+            }
+
             const { status, message } = handlePrismaError(error);
             return res.status(status).json({
                 success: false,
@@ -279,6 +290,30 @@ export class WarehouseController {
             return res.status(400).json({
                 success: false,
                 message: error.message || "Failed to remove member",
+            });
+        }
+    }
+
+    /**
+     * Leave current warehouse (user removes themselves)
+     */
+    async leaveWarehouse(req: Request, res: Response) {
+        try {
+            const userId = req.user!.id;
+            const result = await warehouseService.leaveWarehouse(userId);
+
+            return res.status(200).json({
+                success: true,
+                message: result.message,
+                data: {
+                    leftWarehouse: result.warehouse,
+                },
+            });
+        } catch (error: any) {
+            console.error("Leave warehouse error:", error);
+            return res.status(400).json({
+                success: false,
+                message: error.message || "Failed to leave warehouse",
             });
         }
     }

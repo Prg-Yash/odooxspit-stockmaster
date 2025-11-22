@@ -172,7 +172,7 @@ export class WarehouseService {
             throw new Error("User not found");
         }
 
-        // Check if already a member
+        // Check if already a member of THIS warehouse
         const existing = await prisma.warehouseMember.findUnique({
             where: {
                 warehouseId_userId: {
@@ -184,6 +184,35 @@ export class WarehouseService {
 
         if (existing) {
             throw new Error("User is already a member of this warehouse");
+        }
+
+        // Check if user is member of ANY other warehouse
+        const otherMembership = await prisma.warehouseMember.findFirst({
+            where: {
+                userId: data.userId,
+            },
+            include: {
+                warehouse: {
+                    select: {
+                        id: true,
+                        name: true,
+                        code: true,
+                    },
+                },
+            },
+        });
+
+        if (otherMembership) {
+            const error: any = new Error(
+                `User is already a member of warehouse "${otherMembership.warehouse.name}" (${otherMembership.warehouse.code}). They must leave that warehouse first.`
+            );
+            error.code = "ALREADY_IN_WAREHOUSE";
+            error.existingWarehouse = {
+                id: otherMembership.warehouse.id,
+                name: otherMembership.warehouse.name,
+                code: otherMembership.warehouse.code,
+            };
+            throw error;
         }
 
         return await prisma.warehouseMember.create({
@@ -198,6 +227,14 @@ export class WarehouseService {
                         id: true,
                         email: true,
                         name: true,
+                        role: true,
+                    },
+                },
+                warehouse: {
+                    select: {
+                        id: true,
+                        name: true,
+                        code: true,
                     },
                 },
             },
@@ -246,6 +283,45 @@ export class WarehouseService {
                 },
             },
         });
+    }
+
+    /**
+     * Leave warehouse (user removes themselves)
+     */
+    async leaveWarehouse(userId: string) {
+        // Find user's current warehouse membership
+        const membership = await prisma.warehouseMember.findFirst({
+            where: { userId },
+            include: {
+                warehouse: {
+                    select: {
+                        id: true,
+                        name: true,
+                        code: true,
+                    },
+                },
+            },
+        });
+
+        if (!membership) {
+            throw new Error("You are not a member of any warehouse");
+        }
+
+        // Delete the membership
+        await prisma.warehouseMember.delete({
+            where: {
+                warehouseId_userId: {
+                    warehouseId: membership.warehouseId,
+                    userId,
+                },
+            },
+        });
+
+        return {
+            success: true,
+            message: `Successfully left warehouse "${membership.warehouse.name}"`,
+            warehouse: membership.warehouse,
+        };
     }
 
     /**

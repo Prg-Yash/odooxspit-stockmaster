@@ -56,6 +56,11 @@ model User {
   role                    UserRole
   warehouseMemberships    WarehouseMember[]
   stockMovements          StockMovement[]
+  receiptsCreated         Receipt[]                @relation("ReceiptCreatedBy")
+  receiptsUpdated         Receipt[]                @relation("ReceiptUpdatedBy")
+  deliveriesCreated       Delivery[]               @relation("DeliveryCreatedBy")
+  deliveriesUpdated       Delivery[]               @relation("DeliveryUpdatedBy")
+  deliveriesReceived      Delivery[]               @relation("DeliveryUser")
 }
 
 model RefreshToken {
@@ -139,6 +144,8 @@ model Warehouse {
   products    Product[]
   stockLevels StockLevel[]
   movements   StockMovement[]
+  receipts    Receipt[]
+  deliveries  Delivery[]
 
   @@index([isActive])
   @@index([code])
@@ -160,20 +167,22 @@ model WarehouseMember {
 }
 
 model Location {
-  id          String        @id @default(cuid())
-  warehouseId String
-  name        String
-  code        String
-  aisle       String?
-  rack        String?
-  shelf       String?
-  bin         String?
-  isActive    Boolean       @default(true)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  warehouse   Warehouse     @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
-  stockLevels StockLevel[]
-  movements   StockMovement[]
+  id            String          @id @default(cuid())
+  warehouseId   String
+  name          String
+  code          String
+  aisle         String?
+  rack          String?
+  shelf         String?
+  bin           String?
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  warehouse     Warehouse       @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  stockLevels   StockLevel[]
+  movements     StockMovement[]
+  receiptItems  ReceiptItem[]
+  deliveryItems DeliveryItem[]
 
   @@unique([warehouseId, code])
   @@index([warehouseId, isActive])
@@ -192,21 +201,23 @@ model ProductCategory {
 }
 
 model Product {
-  id           String          @id @default(cuid())
-  warehouseId  String
-  sku          String
-  name         String
-  description  String?
-  categoryId   String?
-  unitOfMeasure UnitOfMeasure  @default(PIECE)
-  reorderLevel Int             @default(0)
-  isActive     Boolean         @default(true)
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  warehouse    Warehouse       @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
-  category     ProductCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  stockLevels  StockLevel[]
-  movements    StockMovement[]
+  id            String           @id @default(cuid())
+  warehouseId   String
+  sku           String
+  name          String
+  description   String?
+  categoryId    String?
+  unitOfMeasure UnitOfMeasure    @default(PIECE)
+  reorderLevel  Int              @default(0)
+  isActive      Boolean          @default(true)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  warehouse     Warehouse        @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  category      ProductCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  stockLevels   StockLevel[]
+  movements     StockMovement[]
+  receiptItems  ReceiptItem[]
+  deliveryItems DeliveryItem[]
 
   @@unique([warehouseId, sku])
   @@index([warehouseId, isActive])
@@ -242,6 +253,7 @@ model StockMovement {
   quantity    Int
   reference   String?
   notes       String?
+  status      MovementStatus    @default(PENDING)
   createdAt   DateTime          @default(now())
   product     Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
   warehouse   Warehouse         @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
@@ -253,5 +265,126 @@ model StockMovement {
   @@index([locationId])
   @@index([userId])
   @@index([type])
+  @@index([status])
   @@index([createdAt])
+}
+
+enum MovementStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ReceiptStatus {
+  DRAFT
+  READY
+  DONE
+}
+
+enum DeliveryStatus {
+  DRAFT
+  READY
+  DONE
+}
+
+model Vendor {
+  id          String     @id @default(cuid())
+  name        String
+  companyName String?
+  email       String?    @unique
+  phone       String?
+  address     String?
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  receipts    Receipt[]
+  deliveries  Delivery[]
+
+  @@index([isActive])
+  @@index([email])
+}
+
+model Receipt {
+  id              String        @id @default(cuid())
+  referenceNumber String        @unique
+  vendorId        String
+  warehouseId     String
+  status          ReceiptStatus @default(DRAFT)
+  createdById     String
+  updatedById     String?
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  vendor          Vendor        @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+  warehouse       Warehouse     @relation(fields: [warehouseId], references: [id], onDelete: Restrict)
+  createdBy       User          @relation("ReceiptCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  updatedBy       User?         @relation("ReceiptUpdatedBy", fields: [updatedById], references: [id], onDelete: Restrict)
+  items           ReceiptItem[]
+
+  @@index([vendorId])
+  @@index([warehouseId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ReceiptItem {
+  id               String   @id @default(cuid())
+  receiptId        String
+  productId        String
+  locationId       String
+  quantityOrdered  Int
+  quantityReceived Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  receipt          Receipt  @relation(fields: [receiptId], references: [id], onDelete: Cascade)
+  product          Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  location         Location @relation(fields: [locationId], references: [id], onDelete: Restrict)
+
+  @@index([receiptId])
+  @@index([productId])
+  @@index([locationId])
+}
+
+model Delivery {
+  id              String         @id @default(cuid())
+  referenceNumber String         @unique
+  vendorId        String?
+  userId          String?
+  warehouseId     String
+  status          DeliveryStatus @default(DRAFT)
+  createdById     String
+  updatedById     String?
+  notes           String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  vendor          Vendor?        @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+  user            User?          @relation("DeliveryUser", fields: [userId], references: [id], onDelete: Restrict)
+  warehouse       Warehouse      @relation(fields: [warehouseId], references: [id], onDelete: Restrict)
+  createdBy       User           @relation("DeliveryCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  updatedBy       User?          @relation("DeliveryUpdatedBy", fields: [updatedById], references: [id], onDelete: Restrict)
+  items           DeliveryItem[]
+
+  @@index([vendorId])
+  @@index([userId])
+  @@index([warehouseId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model DeliveryItem {
+  id               String   @id @default(cuid())
+  deliveryId       String
+  productId        String
+  locationId       String
+  quantityOrdered  Int
+  quantityDelivered Int     @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  delivery         Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  product          Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  location         Location @relation(fields: [locationId], references: [id], onDelete: Restrict)
+
+  @@index([deliveryId])
+  @@index([productId])
+  @@index([locationId])
 }
