@@ -7,6 +7,7 @@ export namespace VendorTypes {
     email: z.string().email("Invalid email format").optional(),
     phone: z.string().optional(),
     address: z.string().optional(),
+    // role: z.enum(["OWNER", "MANAGER", "STAFF"]).default("OWNER"),
   });
 
   export type TInsertVendor = z.infer<typeof SInsertVendor>;

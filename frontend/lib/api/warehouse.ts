@@ -151,3 +151,48 @@ export async function removeWarehouseMember(
     `/warehouses/${warehouseId}/members/${userId}`
   );
 }
+
+// ==================== LOCATION APIs ====================
+
+export interface Location {
+  id: string;
+  name: string;
+  warehouseId: string;
+  aisle?: string;
+  rack?: string;
+  shelf?: string;
+  bin?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateLocationData {
+  name: string;
+  aisle?: string;
+  rack?: string;
+  shelf?: string;
+  bin?: string;
+}
+
+/**
+ * Get all locations in a warehouse
+ */
+export async function getWarehouseLocations(warehouseId: string) {
+  return api.get<ApiResponse<Location[]>>(
+    `/warehouses/${warehouseId}/locations`
+  );
+}
+
+/**
+ * Create a location in a warehouse
+ */
+export async function createWarehouseLocation(
+  warehouseId: string,
+  data: CreateLocationData
+) {
+  return api.post<ApiResponse<Location>>(
+    `/warehouses/${warehouseId}/locations`,
+    data
+  );
+}

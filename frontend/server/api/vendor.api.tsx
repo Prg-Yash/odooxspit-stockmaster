@@ -16,7 +16,7 @@ export const useVendor = () => {
       mutationFn: async (data: VendorTypes.TInsertVendor) => {
         try {
           console.log("=== VENDOR CREATION DEBUG ===");
-          console.log("1. Vendor data:", data);
+          console.log("1. Vendor data to send:", data);
 
           const userStr = localStorage.getItem("user");
           console.log("2. User from localStorage (raw):", userStr);
@@ -48,15 +48,26 @@ export const useVendor = () => {
             console.log("   ❓ Unclear - may need to re-login");
           }
 
-          console.log("\n8. 📊 PERMISSION CHECK:");
+          console.log("\n8. 📊 PERMISSION CHECK (localStorage):");
           console.log(`   User role: ${userRole}`);
           console.log(`   Required: OWNER or MANAGER`);
           console.log(`   Should work: ${userRole === "OWNER" || userRole === "MANAGER" ? "✅ YES" : "❌ NO"}`);
 
-          console.log("\n=== MAKING API REQUEST ===");
-          console.log("Sending request to /vendors with data:", data);
+          // Verify what backend sees by calling /users/me first
+          console.log("\n9. 🔍 VERIFYING BACKEND USER DATA:");
+          try {
+            const currentUser = await api.get("/user/me");
+            console.log("   Backend sees user:", currentUser.data.user);
+            console.log("   Backend sees role:", currentUser.data.user.role);
+            console.log(`   ✅ Backend role check: ${currentUser.data.user.role === "OWNER" || currentUser.data.user.role === "MANAGER" ? "PASS" : "FAIL"}`);
+          } catch (error: any) {
+            console.log("   ❌ Failed to verify user:", error.message);
+          }
+
+          console.log("\n=== MAKING VENDOR CREATION REQUEST ===");
           const response = await api.post("/vendors", data);
           console.log("=== ✅ SUCCESS ===");
+          console.log("Created vendor:", response);
           return response;
         } catch (error: any) {
           // Extract error message from API response
