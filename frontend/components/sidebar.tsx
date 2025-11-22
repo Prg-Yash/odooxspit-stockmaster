@@ -63,7 +63,7 @@ export function Sidebar({ currentPage, onPageChange, onLogout }: SidebarProps) {
       >
         <div className="p-4 md:p-6 border-b-2 border-sidebar-border">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-sidebar-primary rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 bg-sidebar-primary rounded-lg flex items-center justify-center shrink-0">
               <span className="text-sidebar-primary-foreground font-bold text-lg">S</span>
             </div>
             <div className="animate-slide-in-up min-w-0">
@@ -84,13 +84,13 @@ export function Sidebar({ currentPage, onPageChange, onLogout }: SidebarProps) {
                 className={`w-full flex items-center gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200 group text-sm md:text-base ${
                   isActive
                     ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg"
-                    : "text-sidebar-accent hover:bg-sidebar-accent/20 text-sidebar-foreground"
+                    : "text-sidebar-accent hover:bg-sidebar-accent/20 "
                 }`}
               >
-                <Icon size={18} className="flex-shrink-0" />
+                <Icon size={18} className="shrink-0" />
                 <span className="text-left truncate">{item.label}</span>
                 {isActive && (
-                  <div className="w-2 h-2 bg-sidebar-primary-foreground rounded-full ml-auto flex-shrink-0" />
+                  <div className="w-2 h-2 bg-sidebar-primary-foreground rounded-full ml-auto shrink-0" />
                 )}
               </button>
             )

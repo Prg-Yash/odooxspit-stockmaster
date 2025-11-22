@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowRight, TrendingUp, TrendingDown } from "lucide-react"
-import type { MoveRecord } from "@/app/page"
+import type { MoveRecord } from "@/types"
 
 interface MoveHistoryPreviewPageProps {
   moveRecords: MoveRecord[]
@@ -74,7 +74,7 @@ export function MoveHistoryPreviewPage({ moveRecords }: MoveHistoryPreviewPagePr
                       <p className="text-xs text-muted-foreground">Route</p>
                       <div className="flex items-center gap-2 text-sm md:text-base">
                         <span className="font-semibold text-foreground truncate">{move.fromLocation}</span>
-                        <ArrowRight size={16} className="text-muted-foreground flex-shrink-0" />
+                        <ArrowRight size={16} className="text-muted-foreground shrink-0" />
                         <span className="font-semibold text-foreground truncate">{move.toLocation}</span>
                       </div>
                     </div>

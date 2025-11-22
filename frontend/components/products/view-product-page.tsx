@@ -5,7 +5,7 @@ import type React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Package, Calendar, DollarSign, Warehouse } from "lucide-react"
-import type { Product } from "@/app/page"
+import type { Product } from "@/types"
 
 interface ViewProductPageProps {
   productId: string
@@ -36,7 +36,7 @@ export function ViewProductPage({ productId, products }: ViewProductPageProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div className="space-y-3 md:space-y-4">
               <div className="flex items-center gap-3 p-3 md:p-4 bg-secondary/30 rounded-lg">
-                <Package className="text-accent flex-shrink-0" size={20} />
+                <Package className="text-accent shrink-0" size={20} />
                 <div>
                   <p className="text-xs text-muted-foreground">SKU</p>
                   <p className="text-base md:text-lg font-semibold">{product.sku}</p>
@@ -44,7 +44,7 @@ export function ViewProductPage({ productId, products }: ViewProductPageProps) {
               </div>
 
               <div className="flex items-center gap-3 p-3 md:p-4 bg-secondary/30 rounded-lg">
-                <DollarSign className="text-chart-1 flex-shrink-0" size={20} />
+                <DollarSign className="text-chart-1 shrink-0" size={20} />
                 <div>
                   <p className="text-xs text-muted-foreground">Price</p>
                   <p className="text-base md:text-lg font-semibold">${product.price.toFixed(2)}</p>
@@ -52,7 +52,7 @@ export function ViewProductPage({ productId, products }: ViewProductPageProps) {
               </div>
 
               <div className="flex items-center gap-3 p-3 md:p-4 bg-secondary/30 rounded-lg">
-                <Warehouse className="text-primary flex-shrink-0" size={20} />
+                <Warehouse className="text-primary shrink-0" size={20} />
                 <div>
                   <p className="text-xs text-muted-foreground">Stock Quantity</p>
                   <p className="text-base md:text-lg font-semibold">{product.quantity} units</p>
@@ -60,7 +60,7 @@ export function ViewProductPage({ productId, products }: ViewProductPageProps) {
               </div>
 
               <div className="flex items-center gap-3 p-3 md:p-4 bg-secondary/30 rounded-lg">
-                <Calendar className="text-muted-foreground flex-shrink-0" size={20} />
+                <Calendar className="text-muted-foreground shrink-0" size={20} />
                 <div>
                   <p className="text-xs text-muted-foreground">Created On</p>
                   <p className="text-base md:text-lg font-semibold">{product.createdAt}</p>

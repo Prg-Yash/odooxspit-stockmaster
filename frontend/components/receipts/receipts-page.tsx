@@ -3,7 +3,8 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Download, Eye, Trash2, FileText } from "lucide-react"
+import { Download, Eye, Trash2 } from "lucide-react"
+import { ReceiptGenerateDialog } from "@/components/dialogs/receipt-generate-dialog"
 
 interface Receipt {
   id: string
@@ -74,17 +75,14 @@ export function ReceiptsPage() {
   return (
     <div className="space-y-4 md:space-y-6 animate-fade-in">
       {/* Header with Actions */}
-      <div className="flex flex-col sm:flex-row gap-3 md:gap-4 items-stretch sm:items-center justify-between">
+      <div className="flex flex-col md:flex-row gap-3 md:gap-4 items-stretch md:items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Total Receipts: {receipts.length}</h2>
           <p className="text-sm text-muted-foreground">Manage and view purchase receipts</p>
         </div>
-        <Button
-          onClick={() => (window.location.pathname = "/")}
-          className="bg-accent hover:bg-accent/90 text-accent-foreground gap-2 whitespace-nowrap w-full sm:w-auto"
-        >
-          <FileText size={18} /> Generate Receipt
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+          <ReceiptGenerateDialog />
+        </div>
       </div>
 
       {/* Filters */}
@@ -102,12 +100,12 @@ export function ReceiptsPage() {
       </div>
 
       {/* Receipts Table */}
-      <Card className="border-2">
+      <Card className="border-2 overflow-x-auto">
         <CardHeader>
           <CardTitle className="text-base md:text-lg">Receipts ({filteredReceipts.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
+          <div className="w-full min-w-[600px] md:min-w-0">
             <table className="w-full text-xs md:text-sm">
               <thead>
                 <tr className="border-b-2 border-border">

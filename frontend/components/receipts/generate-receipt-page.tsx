@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, Plus, Trash2, Download } from "lucide-react"
-import type { Vendor, Product } from "@/app/page"
+import type { Vendor, Product } from "@/types"
 
 interface GenerateReceiptPageProps {
   vendors: Vendor[]
@@ -74,7 +74,7 @@ export function GenerateReceiptPage({ vendors, products }: GenerateReceiptPagePr
         total: calculateTotal(),
       }
 
-      const receiptText = `
+      const receiptText = `\
 PURCHASE RECEIPT
 ================
 Date: ${receiptData.date}
@@ -115,7 +115,7 @@ ${receiptData.notes || "N/A"}
         <CardContent>
           <form className="space-y-4 md:space-y-6">
             {/* Receipt Header */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="vendor">Vendor *</Label>
                 <select
@@ -165,7 +165,7 @@ ${receiptData.notes || "N/A"}
               <h3 className="font-semibold text-foreground">Receipt Items</h3>
 
               {/* Add Item Form */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 p-4 bg-secondary/30 rounded-lg">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-secondary/30 rounded-lg">
                 <div className="space-y-2">
                   <Label htmlFor="product" className="text-sm">
                     Product
@@ -201,7 +201,7 @@ ${receiptData.notes || "N/A"}
                   <Label htmlFor="price" className="text-sm">
                     Unit Price
                   </Label>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-col sm:flex-row">
                     <Input
                       id="price"
                       type="number"
@@ -213,7 +213,7 @@ ${receiptData.notes || "N/A"}
                     <Button
                       type="button"
                       onClick={handleAddItem}
-                      className="bg-accent hover:bg-accent/90 px-3 md:px-4 text-sm"
+                      className="bg-accent hover:bg-accent/90 px-3 sm:px-4 text-sm w-full sm:w-auto"
                     >
                       <Plus size={16} />
                     </Button>
@@ -226,8 +226,8 @@ ${receiptData.notes || "N/A"}
                 {items.length === 0 ? (
                   <p className="text-center text-muted-foreground py-4">No items added yet</p>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs md:text-sm">
+                  <div className="overflow-x-auto w-full">
+                    <table className="min-w-[500px] w-full text-xs md:text-sm">
                       <thead>
                         <tr className="border-b-2 border-border">
                           <th className="text-left py-2 px-3 font-semibold">Product</th>
@@ -267,7 +267,7 @@ ${receiptData.notes || "N/A"}
               </div>
 
               {/* Total */}
-              <div className="flex justify-end p-4 bg-secondary/30 rounded-lg">
+              <div className="flex justify-end p-3 sm:p-4 bg-secondary/30 rounded-lg">
                 <div className="text-right">
                   <p className="text-muted-foreground mb-2">Grand Total:</p>
                   <p className="text-2xl md:text-3xl font-bold text-primary">${calculateTotal().toFixed(2)}</p>
@@ -289,15 +289,15 @@ ${receiptData.notes || "N/A"}
             </div>
 
             {/* Actions */}
-            <div className="flex gap-2 pt-4 flex-wrap">
+            <div className="flex gap-2 pt-4 flex-wrap w-full">
               <Button
                 type="button"
                 onClick={handleGenerateReceipt}
-                className="bg-accent hover:bg-accent/90 gap-2 flex-1 sm:flex-none"
+                className="bg-accent hover:bg-accent/90 gap-2 w-full sm:w-auto"
               >
                 <Download size={18} /> Generate & Download Receipt
               </Button>
-              <Button type="button" variant="outline" className="border-2 flex-1 sm:flex-none bg-transparent">
+              <Button type="button" variant="outline" className="border-2 w-full sm:w-auto bg-transparent">
                 Cancel
               </Button>
             </div>
