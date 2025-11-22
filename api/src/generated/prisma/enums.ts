@@ -19,6 +19,7 @@ export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 
 export const WarehouseMemberRole = {
+  OWNER: 'OWNER',
   MANAGER: 'MANAGER',
   STAFF: 'STAFF'
 } as const

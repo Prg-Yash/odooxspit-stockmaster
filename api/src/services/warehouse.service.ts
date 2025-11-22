@@ -7,16 +7,24 @@ import type {
     CreateLocationDto,
     UpdateLocationDto,
 } from "../types/warehouse.types";
-import { UserRole } from "../generated/prisma/enums";
+import { UserRole, WarehouseMemberRole } from "../generated/prisma/enums";
 import { sendWarehouseMemberAddedEmail } from "../lib/mailer";
 
 export class WarehouseService {
     /**
      * Create a new warehouse
      */
-    async createWarehouse(data: CreateWarehouseDto) {
+    async createWarehouse(data: CreateWarehouseDto, userId: string) {
         return await prisma.warehouse.create({
-            data,
+            data: {
+                ...data,
+                members: {
+                    create: {
+                        userId: userId,
+                        role: WarehouseMemberRole.OWNER,
+                    },
+                },
+            },
             include: {
                 members: {
                     include: {

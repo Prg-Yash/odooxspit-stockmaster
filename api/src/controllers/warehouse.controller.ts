@@ -68,12 +68,12 @@ export class WarehouseController {
     async createWarehouse(req: Request, res: Response) {
         try {
             const validatedData = createWarehouseSchema.parse(req.body);
-            const warehouse = await warehouseService.createWarehouse(validatedData);
+            const warehouse = await warehouseService.createWarehouse(validatedData, req.user!.id);
 
             return res.status(201).json({
                 success: true,
                 message: "Warehouse created successfully.",
-                data: warehouse,
+                data: { warehouse },
             });
         } catch (error: any) {
             console.error("Create warehouse error:", error);
