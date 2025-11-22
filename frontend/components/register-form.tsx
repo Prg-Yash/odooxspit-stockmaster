@@ -31,8 +31,8 @@ export function RegisterForm({
       role: "owner",
     },
   });
-  const { registerUser } = useAuthentication();
-  const { mutateAsync: register, isPending } = registerUser();
+  const { registerMutation } = useAuthentication();
+  const { mutateAsync: register, isPending } = registerMutation();
 
   async function onSubmit(data: AuthTypes.TRegisterUser) {
     await register(data);

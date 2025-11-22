@@ -11,7 +11,7 @@ export const useAuthentication = () => {
   const router = useRouter();
   const [toastID, setToastID] = React.useState<string | number>("");
 
-  const registerUser = () =>
+  const registerMutation = () =>
     useMutation({
       mutationFn: async (data: AuthTypes.TRegisterUser) => {
         const res = await makeApiRequest({
@@ -39,5 +39,34 @@ export const useAuthentication = () => {
       },
     });
 
-  return { registerUser };
+  const loginMutation = () =>
+    useMutation({
+      mutationFn: async (data: AuthTypes.TLoginUser) => {
+        const res = await makeApiRequest({
+          endpoint: "/auth/login",
+          opts: {
+            body: JSON.stringify(data),
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          },
+        });
+
+        if (!res.ok) {
+          const error = (await res.json()) as any;
+          throw new Error(error.message);
+        }
+
+        return await res.json();
+      },
+
+      onMutate: () =>
+        setToastID(toast.loading("Loggin in...", { richColors: true })),
+      onError: (error) => toast.error(error.message, { id: toastID }),
+      onSuccess: () => {
+        toast.success("Logged in successfully", { id: toastID });
+        router.push("/dashboard");
+      },
+    });
+
+  return { registerMutation, loginMutation };
 };

@@ -217,7 +217,7 @@ async function login(req: Request, res: Response) {
       os: deviceInfo.os,
     });
 
-    // Set refresh token in cookie
+    res.cookie("accessToken", accessToken, COOKIE_OPTIONS);
     res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
 
     res.status(200).json({
