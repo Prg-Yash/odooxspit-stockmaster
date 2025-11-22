@@ -29,21 +29,20 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4 animate-fade-in">
-      <Card className="w-full max-w-md border-2 shadow-lg animate-scale-in">
-        <CardHeader className="space-y-2 border-b border-border pb-4 md:pb-6">
-          <div className="flex items-center gap-2 mb-2 md:mb-4">
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-accent rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-accent-foreground font-bold text-sm md:text-base">S</span>
-            </div>
-            <span className="text-lg md:text-xl font-bold text-foreground">StockMaster</span>
+    <Card className="w-full max-w-md border-2 shadow-lg animate-scale-in">
+      <CardHeader className="space-y-2 border-b border-border pb-4 md:pb-6">
+        <div className="flex items-center gap-2 mb-2 md:mb-4">
+          <div className="w-8 h-8 md:w-10 md:h-10 bg-accent rounded-lg flex items-center justify-center flex-shrink-0">
+            <span className="text-accent-foreground font-bold text-sm md:text-base">S</span>
           </div>
-          <CardTitle className="text-xl md:text-2xl">{isLogin ? "Login" : "Sign Up"}</CardTitle>
-          <CardDescription className="text-xs md:text-sm">
-            {isLogin ? "Access your inventory management system" : "Create a new account"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-4 md:pt-6">
+          <span className="text-lg md:text-xl font-bold text-foreground">StockMaster</span>
+        </div>
+        <CardTitle className="text-xl md:text-2xl">{isLogin ? "Login" : "Sign Up"}</CardTitle>
+        <CardDescription className="text-xs md:text-sm">
+          {isLogin ? "Access your inventory management system" : "Create a new account"}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="pt-4 md:pt-6">
           <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-xs md:text-sm font-medium">
@@ -116,6 +115,5 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
           </div>
         </CardContent>
       </Card>
-    </div>
   )
 }
