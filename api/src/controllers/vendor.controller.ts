@@ -24,6 +24,10 @@ function handlePrismaError(error: any): string {
 
 export const createVendor = async (req: Request, res: Response) => {
     try {
+        // Check if user is OWNER or MANAGER
+        if (req.user?.role !== "OWNER" && req.user?.role !== "MANAGER") {
+            return res.status(403).json({ error: "Only OWNER and MANAGER can create vendors" });
+        }
         const data = createVendorSchema.parse(req.body);
         const vendor = await vendorService.createVendor(data);
         res.status(201).json(vendor);
@@ -69,6 +73,10 @@ export const updateVendor = async (req: Request, res: Response) => {
         if (!id) {
             return res.status(400).json({ error: "Vendor ID is required" });
         }
+        // Check if user is OWNER or MANAGER
+        if (req.user?.role !== "OWNER" && req.user?.role !== "MANAGER") {
+            return res.status(403).json({ error: "Only OWNER and MANAGER can update vendors" });
+        }
         const data = updateVendorSchema.parse(req.body);
         const vendor = await vendorService.updateVendor(id, data);
         res.json(vendor);
@@ -86,11 +94,18 @@ export const deleteVendor = async (req: Request, res: Response) => {
         if (!id) {
             return res.status(400).json({ error: "Vendor ID is required" });
         }
+        // Check if user is OWNER or MANAGER
+        if (req.user?.role !== "OWNER" && req.user?.role !== "MANAGER") {
+            return res.status(403).json({ error: "Only OWNER and MANAGER can delete vendors" });
+        }
         await vendorService.deleteVendor(id);
-        res.status(204).send();
+        res.status(200).json({ message: "Vendor deleted successfully" });
     } catch (error: any) {
-        if (error.message.includes("draft receipts")) {
+        if (error.message && error.message.includes("draft")) {
             return res.status(400).json({ error: error.message });
+        }
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2003") {
+            return res.status(400).json({ error: "Cannot delete vendor with existing receipts or deliveries" });
         }
         res.status(500).json({ error: handlePrismaError(error) });
     }

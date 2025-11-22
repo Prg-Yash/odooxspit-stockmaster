@@ -62,7 +62,7 @@ async function register(req: Request, res: Response) {
     });
 
     if (existingUser) {
-      return res.status(400).json({
+      return res.status(409).json({
         success: false,
         message: "User with this email already exists.",
       });
@@ -98,10 +98,12 @@ async function register(req: Request, res: Response) {
       message:
         "User registered successfully. Please check your email to verify your account.",
       data: {
-        userId: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        },
       },
     });
   } catch (error) {

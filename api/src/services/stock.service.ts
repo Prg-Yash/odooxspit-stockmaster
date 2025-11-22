@@ -188,7 +188,8 @@ export class StockService {
         });
 
         const currentQuantity = currentStock?.quantity || 0;
-        const quantityDelta = data.newQuantity - currentQuantity;
+        const targetQuantity = data.newQuantity ?? data.quantity ?? currentQuantity;
+        const quantityDelta = targetQuantity - currentQuantity;
 
         if (quantityDelta === 0) {
             throw new Error("New quantity is same as current quantity");
@@ -205,8 +206,8 @@ export class StockService {
                 locationId: data.locationId,
                 quantityDelta,
                 movementType: StockMovementType.ADJUSTMENT,
-                reference: data.reference,
-                notes: data.notes || `Adjusted from ${currentQuantity} to ${data.newQuantity}`,
+                reference: data.reference || data.reason,
+                notes: data.notes || `Adjusted from ${currentQuantity} to ${targetQuantity}`,
             },
             userId
         );

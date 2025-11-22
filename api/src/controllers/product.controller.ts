@@ -7,6 +7,7 @@ import {
     updateProductCategorySchema,
 } from "../types/product.types";
 import type { WarehouseAuthRequest } from "../middlewares/require-warehouse-role";
+import { prisma } from "../lib/prisma";
 
 const productService = new ProductService();
 
@@ -161,6 +162,12 @@ export class ProductController {
             });
         } catch (error: any) {
             console.error("Create product error:", error);
+            if (error.code === "DUPLICATE_SKU" || (error.code === "P2002" && error.meta?.target?.includes("sku"))) {
+                return res.status(409).json({
+                    success: false,
+                    message: "Product with this SKU already exists in this warehouse",
+                });
+            }
             return res.status(400).json({
                 success: false,
                 message: error.message || "Failed to create product",
@@ -241,9 +248,35 @@ export class ProductController {
             if (!productId) {
                 return res.status(400).json({ success: false, message: "Product ID required" });
             }
+
+            // Get product to check warehouse access
+            const product = await prisma.product.findUnique({
+                where: { id: productId }
+            });
+
+            if (!product) {
+                return res.status(404).json({ success: false, message: "Product not found" });
+            }
+
+            // Check user has manager role in this warehouse
+            if (req.user?.role !== "OWNER") {
+                const member = await prisma.warehouseMember.findUnique({
+                    where: {
+                        warehouseId_userId: {
+                            warehouseId: product.warehouseId,
+                            userId: req.user!.id
+                        }
+                    }
+                });
+
+                if (!member || member.role !== "MANAGER") {
+                    return res.status(403).json({ success: false, message: "Manager role required" });
+                }
+            }
+
             const validatedData = updateProductSchema.parse(req.body);
 
-            const product = await productService.updateProduct(
+            const updatedProduct = await productService.updateProduct(
                 productId,
                 validatedData
             );
@@ -251,7 +284,7 @@ export class ProductController {
             return res.status(200).json({
                 success: true,
                 message: "Product updated successfully",
-                data: product,
+                data: updatedProduct,
             });
         } catch (error: any) {
             console.error("Update product error:", error);
@@ -271,6 +304,32 @@ export class ProductController {
             if (!productId) {
                 return res.status(400).json({ success: false, message: "Product ID required" });
             }
+
+            // Get product to check warehouse access
+            const product = await prisma.product.findUnique({
+                where: { id: productId }
+            });
+
+            if (!product) {
+                return res.status(404).json({ success: false, message: "Product not found" });
+            }
+
+            // Check user has manager role in this warehouse
+            if (req.user?.role !== "OWNER") {
+                const member = await prisma.warehouseMember.findUnique({
+                    where: {
+                        warehouseId_userId: {
+                            warehouseId: product.warehouseId,
+                            userId: req.user!.id
+                        }
+                    }
+                });
+
+                if (!member || member.role !== "MANAGER") {
+                    return res.status(403).json({ success: false, message: "Manager role required" });
+                }
+            }
+
             await productService.deleteProduct(productId);
 
             return res.status(200).json({

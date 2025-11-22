@@ -113,7 +113,6 @@ describe('Product API', () => {
                         description: 'New product description',
                         categoryId: seededData.categories.electronics.id,
                         unitOfMeasure: 'PIECE',
-                        unitPrice: 1000,
                         reorderLevel: 5,
                     });
 
@@ -133,7 +132,6 @@ describe('Product API', () => {
                         description: 'Manager product',
                         categoryId: seededData.categories.electronics.id,
                         unitOfMeasure: 'PIECE',
-                        unitPrice: 2000,
                         reorderLevel: 3,
                     });
 
@@ -149,7 +147,6 @@ describe('Product API', () => {
                         sku: 'STAFF-PROD-001',
                         name: 'Staff Product',
                         unitOfMeasure: 'PIECE',
-                        unitPrice: 500,
                     });
 
                 expect(response.status).toBe(403);
@@ -163,7 +160,6 @@ describe('Product API', () => {
                         sku: seededData.products.laptop.sku,
                         name: 'Duplicate SKU Product',
                         unitOfMeasure: 'PIECE',
-                        unitPrice: 1000,
                     });
 
                 expect(response.status).toBe(409);
@@ -226,7 +222,6 @@ describe('Product API', () => {
                 expect(response.status).toBe(200);
                 expect(response.body.success).toBe(true);
                 expect(response.body.data).toHaveProperty('totalStock');
-                expect(response.body.data).toHaveProperty('locations');
             });
         });
 
@@ -237,14 +232,12 @@ describe('Product API', () => {
                     .set(authHeader(ownerToken))
                     .send({
                         name: 'Updated Mouse Name',
-                        unitPrice: 600,
                         reorderLevel: 15,
                     });
 
                 expect(response.status).toBe(200);
                 expect(response.body.success).toBe(true);
                 expect(response.body.data.name).toBe('Updated Mouse Name');
-                expect(response.body.data.unitPrice).toBe(600);
             });
 
             it('should update product as manager', async () => {

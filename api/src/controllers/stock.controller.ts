@@ -43,7 +43,7 @@ export class StockController {
                 validatedData.notes
             );
 
-            return res.status(201).json({
+            return res.status(200).json({
                 success: true,
                 message: "Stock received successfully",
                 data: result,
@@ -89,7 +89,7 @@ export class StockController {
                 validatedData.notes
             );
 
-            return res.status(201).json({
+            return res.status(200).json({
                 success: true,
                 message: "Stock delivered successfully",
                 data: result,
@@ -113,7 +113,7 @@ export class StockController {
 
             const result = await stockService.adjustStock(validatedData, userId);
 
-            return res.status(201).json({
+            return res.status(200).json({
                 success: true,
                 message: "Stock adjusted successfully",
                 data: result,
@@ -137,10 +137,15 @@ export class StockController {
 
             const result = await stockService.transferStock(validatedData, userId);
 
-            return res.status(201).json({
+            return res.status(200).json({
                 success: true,
                 message: "Stock transferred successfully",
-                data: result,
+                data: {
+                    transferOut: result.transferOut.movement,
+                    transferIn: result.transferIn.movement,
+                    fromLocation: result.fromLocation,
+                    toLocation: result.toLocation,
+                },
             });
         } catch (error: any) {
             console.error("Transfer stock error:", error);
@@ -182,7 +187,12 @@ export class StockController {
 
             return res.status(200).json({
                 success: true,
-                data: result,
+                data: result.movements,
+                pagination: {
+                    total: result.total,
+                    limit: result.limit,
+                    offset: result.offset,
+                },
             });
         } catch (error: any) {
             console.error("Get stock movements error:", error);

@@ -20,13 +20,13 @@ router.get("/:id", deliveryController.getDeliveryById);
 // Print delivery PDF
 router.get("/:id/print", deliveryController.printDelivery);
 
-// Update delivery (MANAGER only)
-router.put("/:id", requireWarehouseManager, deliveryController.updateDelivery);
+// Update delivery (MANAGER only, role check in controller)
+router.put("/:id", deliveryController.updateDelivery);
 
-// Update delivery status (MANAGER only)
-router.patch("/:id/status", requireWarehouseManager, deliveryController.updateDeliveryStatus);
+// Update delivery status (MANAGER only, role check in controller)
+router.patch("/:id/status", deliveryController.updateDeliveryStatus);
 
-// Delete delivery (MANAGER only)
-router.delete("/:id", requireWarehouseManager, deliveryController.deleteDelivery);
+// Delete delivery (MANAGER only, role check in controller)
+router.delete("/:id", deliveryController.deleteDelivery);
 
 export default router;

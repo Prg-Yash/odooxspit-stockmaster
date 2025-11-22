@@ -34,7 +34,7 @@ export const updateWarehouseMemberSchema = z.object({
 // Location DTOs
 export const createLocationSchema = z.object({
     name: z.string().min(1, "Name is required"),
-    code: z.string().min(1, "Code is required"),
+    code: z.string().min(1, "Code is required").optional(),
     aisle: z.string().optional(),
     rack: z.string().optional(),
     shelf: z.string().optional(),

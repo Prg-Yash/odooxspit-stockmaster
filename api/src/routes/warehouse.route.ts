@@ -4,6 +4,7 @@ import { requireAuth } from "../middlewares/require-auth";
 import {
     requireWarehouseAccess,
     requireWarehouseManager,
+    requireOwner,
 } from "../middlewares/require-warehouse-role";
 
 const router = Router();
@@ -18,6 +19,7 @@ router.post("/leave", warehouseController.leaveWarehouse.bind(warehouseControlle
 // Warehouse CRUD
 router.post(
     "/",
+    requireOwner,
     warehouseController.createWarehouse.bind(warehouseController)
 );
 router.get("/", warehouseController.getWarehouses.bind(warehouseController));

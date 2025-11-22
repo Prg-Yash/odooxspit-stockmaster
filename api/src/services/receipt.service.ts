@@ -48,7 +48,7 @@ export class ReceiptService {
                         create: data.items.map((item) => ({
                             productId: item.productId,
                             locationId: item.locationId,
-                            quantityOrdered: item.quantityOrdered,
+                            quantityOrdered: item.quantityOrdered || item.quantity || 0,
                             quantityReceived: 0,
                         })),
                     },

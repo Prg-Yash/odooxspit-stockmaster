@@ -10,7 +10,9 @@ export const createDeliverySchema = z.object({
         z.object({
             productId: z.string().cuid("Invalid product ID"),
             locationId: z.string().cuid("Invalid location ID"),
-            quantityOrdered: z.number().int().positive("Quantity must be positive"),
+            quantity: z.number().int().positive("Quantity must be positive").optional(),
+            quantityOrdered: z.number().int().positive("Quantity must be positive").optional(),
+            unitPrice: z.number().positive("Unit price must be positive").optional(),
         })
     ).min(1, "At least one item is required"),
 }).refine((data) => data.vendorId || data.userId, {

@@ -20,13 +20,13 @@ router.get("/:id", receiptController.getReceiptById);
 // Print receipt PDF
 router.get("/:id/print", receiptController.printReceipt);
 
-// Update receipt (MANAGER only)
-router.put("/:id", requireWarehouseManager, receiptController.updateReceipt);
+// Update receipt (MANAGER only, role check in controller)
+router.put("/:id", receiptController.updateReceipt);
 
-// Update receipt status (MANAGER only)
-router.patch("/:id/status", requireWarehouseManager, receiptController.updateReceiptStatus);
+// Update receipt status (MANAGER only, role check in controller)
+router.patch("/:id/status", receiptController.updateReceiptStatus);
 
-// Delete receipt (MANAGER only)
-router.delete("/:id", requireWarehouseManager, receiptController.deleteReceipt);
+// Delete receipt (MANAGER only, role check in controller)
+router.delete("/:id", receiptController.deleteReceipt);
 
 export default router;

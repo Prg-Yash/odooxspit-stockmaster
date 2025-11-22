@@ -49,7 +49,7 @@ export class DeliveryService {
                         create: data.items.map((item) => ({
                             productId: item.productId,
                             locationId: item.locationId,
-                            quantityOrdered: item.quantityOrdered,
+                            quantityOrdered: item.quantityOrdered || item.quantity || 0,
                             quantityDelivered: 0,
                         })),
                     },
