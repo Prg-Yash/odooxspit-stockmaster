@@ -209,7 +209,7 @@ MIT
 
 - UI: [shadcn/ui](https://ui.shadcn.com/)
 - Icons: [Lucide](https://lucide.dev/)
-- Backend: Express, TypeScript
+- Backend: Express, TypeScript, Prisma, Postgresql(db)
 - Frontend: Next.js, React, Tailwind CSS
 
 ---
@@ -245,28 +245,3 @@ For support or questions, open an issue or contact the maintainer.
 - [Manager Workflow](./MANAGER_WORKFLOW.md)
 
 ---
-
-## 🤝 Contributing
-
-Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
-
----
-
-## 📄 License
-
-MIT
-
----
-
-## 📢 Credits
-
-- UI: [shadcn/ui](https://ui.shadcn.com/)
-- Icons: [Lucide](https://lucide.dev/)
-- Backend: Express, TypeScript
-- Frontend: Next.js, React, Tailwind CSS
-
----
-
-## 📬 Contact
-
-For support or questions, open an issue or contact the maintainer.
