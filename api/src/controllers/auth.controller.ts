@@ -42,10 +42,14 @@ async function register(req: Request, res: Response) {
   try {
     const result = AuthTypes.SRegister.safeParse(req.body);
 
+    if (!success)
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or missing data." });
     if (!result.success) {
       const errors = result.error.issues.map(e => e.message).join(", ");
-      return res.status(400).json({ 
-        success: false, 
+      return res.status(400).json({
+        success: false,
         message: errors || "Validation failed."
       });
     }
@@ -56,52 +60,52 @@ async function register(req: Request, res: Response) {
       where: { email: data.email },
     });
 
-    if (existingUser) {
+    if (existingUser)
       return res.status(400).json({
         success: false,
         message: "User with this email already exists.",
       });
-    }
+  }
 
     const hashedPassword = await hashPassword(data.password);
 
-    const user = await prisma.user.create({
-      data: {
-        email: data.email,
-        password: hashedPassword,
-        name: data.name,
-        role:
-          data.role === "owner"
-            ? UserRole.OWNER
-            : data.role === "manager"
+  const user = await prisma.user.create({
+    data: {
+      email: data.email,
+      password: hashedPassword,
+      name: data.name,
+      role:
+        data.role === "owner"
+          ? UserRole.OWNER
+          : data.role === "manager"
             ? UserRole.MANAGER
             : UserRole.STAFF,
-      },
-    });
+    },
+  });
 
-    // Generate email verification token
-    const verificationToken = await createEmailVerificationToken(
-      user.id,
-      data.email
-    );
+  // Generate email verification token
+  const verificationToken = await createEmailVerificationToken(
+    user.id,
+    data.email
+  );
 
-    res.status(201).json({
-      success: true,
-      message:
-        "User registered successfully. Please check your email to verify your account.",
-      data: {
-        userId: user.id,
-        email: user.email,
-        name: user.name,
-      },
-    });
-  } catch (error) {
-    console.error("Register error:", error);
-    res.status(500).json({
-      success: false,
-      message: "An error occurred during registration.",
-    });
-  }
+  res.status(201).json({
+    success: true,
+    message:
+      "User registered successfully. Please check your email to verify your account.",
+    data: {
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+    },
+  });
+} catch (error) {
+  console.error("Register error:", error);
+  res.status(500).json({
+    success: false,
+    message: "An error occurred during registration.",
+  });
+}
 }
 
 /**
@@ -208,8 +212,7 @@ async function login(req: Request, res: Response) {
     const accessToken = generateAccessToken(user.id, user.email);
 
     // Extract session metadata
-    const userAgent =
-      (req.headers["x-forwarded-for"] as string).split(",")[0]?.trim() || "";
+    const userAgent = (req.headers["x-forwarded-for"] as string) || "";
     const ipAddress = getClientIp(req);
     const deviceInfo = parseUserAgent(userAgent);
     const deviceName = generateDeviceName(

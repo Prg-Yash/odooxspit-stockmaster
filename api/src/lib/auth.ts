@@ -32,7 +32,7 @@ async function verifyPassword(password: string, hash: string) {
  */
 function generateAccessToken(userId: string, email: string) {
   return jwt.sign({ userId, email }, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
+    expiresIn: "15m",
   } as SignOptions);
 }
 
@@ -252,7 +252,7 @@ async function createEmailVerificationToken(userId: string, email: string) {
  * Verify email verification token
  */
 async function verifyEmailVerificationToken(token: string, email: string) {
-  const hashedToken = hashToken(token);
+  const hashedToken = token;
 
   const verificationToken = await prisma.emailVerificationToken.findFirst({
     where: {

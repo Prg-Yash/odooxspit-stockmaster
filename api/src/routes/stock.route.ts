@@ -11,46 +11,46 @@ router.use(requireAuth);
 
 // Stock Operations (all require warehouse access)
 router.post(
-  "/warehouse/:warehouseId/receive",
-  requireWarehouseAccess,
-  stockController.receiveStock.bind(stockController)
+    "/warehouse/:warehouseId/receive",
+    requireWarehouseAccess,
+    stockController.receiveStock.bind(stockController)
 );
 router.post(
-  "/warehouse/:warehouseId/deliver",
-  requireWarehouseAccess,
-  stockController.deliverStock.bind(stockController)
+    "/warehouse/:warehouseId/deliver",
+    requireWarehouseAccess,
+    stockController.deliverStock.bind(stockController)
 );
 router.post(
-  "/adjust",
-  requireWarehouseAccess,
-  stockController.adjustStock.bind(stockController)
+    "/adjust",
+    requireWarehouseAccess,
+    stockController.adjustStock.bind(stockController)
 );
 router.post(
-  "/transfer",
-  requireWarehouseAccess,
-  stockController.transferStock.bind(stockController)
+    "/transfer",
+    requireWarehouseAccess,
+    stockController.transferStock.bind(stockController)
 );
 
 // Stock Queries
 router.get(
-  "/warehouse/:warehouseId/levels",
-  requireWarehouseAccess,
-  stockController.getStockLevels.bind(stockController)
+    "/warehouse/:warehouseId/levels",
+    requireWarehouseAccess,
+    stockController.getStockLevels.bind(stockController)
 );
 router.get(
-  "/warehouse/:warehouseId/movements",
-  requireWarehouseAccess,
-  stockController.getStockMovements.bind(stockController)
+    "/warehouse/:warehouseId/movements",
+    requireWarehouseAccess,
+    stockController.getStockMovements.bind(stockController)
 );
 router.get(
-  "/warehouse/:warehouseId/alerts",
-  requireWarehouseAccess,
-  stockController.getLowStockAlerts.bind(stockController)
+    "/warehouse/:warehouseId/alerts",
+    requireWarehouseAccess,
+    stockController.getLowStockAlerts.bind(stockController)
 );
 router.get(
-  "/warehouse/:warehouseId/summary",
-  requireWarehouseAccess,
-  stockController.getWarehouseStockSummary.bind(stockController)
+    "/warehouse/:warehouseId/summary",
+    requireWarehouseAccess,
+    stockController.getWarehouseStockSummary.bind(stockController)
 );
 
 export { router as stockRouter };
