@@ -9,8 +9,57 @@ import {
     updateLocationSchema,
 } from "../types/warehouse.types";
 import type { WarehouseAuthRequest } from "../middlewares/require-warehouse-role";
+import { Prisma } from "../generated/prisma/client";
+import { ZodError } from "zod";
 
 const warehouseService = new WarehouseService();
+
+/**
+ * Handle Prisma errors and return user-friendly messages
+ */
+function handlePrismaError(error: any): { status: number; message: string } {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        switch (error.code) {
+            case "P2002":
+                // Unique constraint violation
+                const field = (error.meta?.target as string[])?.[0] || "field";
+                return {
+                    status: 409,
+                    message: `A warehouse with this ${field} already exists. Please use a different ${field}.`,
+                };
+            case "P2003":
+                // Foreign key constraint violation
+                return {
+                    status: 400,
+                    message: "Referenced record not found. Please check the provided IDs.",
+                };
+            case "P2025":
+                // Record not found
+                return {
+                    status: 404,
+                    message: "Record not found.",
+                };
+            default:
+                return {
+                    status: 400,
+                    message: "Database operation failed. Please check your input.",
+                };
+        }
+    }
+
+    if (error instanceof ZodError) {
+        const messages = error.errors.map((e) => e.message).join(", ");
+        return {
+            status: 400,
+            message: `Validation failed: ${messages}`,
+        };
+    }
+
+    return {
+        status: 500,
+        message: error.message || "An unexpected error occurred.",
+    };
+}
 
 export class WarehouseController {
     /**
@@ -23,14 +72,15 @@ export class WarehouseController {
 
             return res.status(201).json({
                 success: true,
-                message: "Warehouse created successfully",
-                data: warehouse,
+                message: "Warehouse created successfully.",
+                data: { warehouse },
             });
         } catch (error: any) {
             console.error("Create warehouse error:", error);
-            return res.status(400).json({
+            const { status, message } = handlePrismaError(error);
+            return res.status(status).json({
                 success: false,
-                message: error.message || "Failed to create warehouse",
+                message,
             });
         }
     }
@@ -110,14 +160,15 @@ export class WarehouseController {
 
             return res.status(200).json({
                 success: true,
-                message: "Warehouse updated successfully",
-                data: warehouse,
+                message: "Warehouse updated successfully.",
+                data: { warehouse },
             });
         } catch (error: any) {
             console.error("Update warehouse error:", error);
-            return res.status(400).json({
+            const { status, message } = handlePrismaError(error);
+            return res.status(status).json({
                 success: false,
-                message: error.message || "Failed to update warehouse",
+                message,
             });
         }
     }
@@ -164,14 +215,15 @@ export class WarehouseController {
 
             return res.status(201).json({
                 success: true,
-                message: "Member added successfully",
-                data: member,
+                message: "Member added successfully.",
+                data: { member },
             });
         } catch (error: any) {
             console.error("Add member error:", error);
-            return res.status(400).json({
+            const { status, message } = handlePrismaError(error);
+            return res.status(status).json({
                 success: false,
-                message: error.message || "Failed to add member",
+                message,
             });
         }
     }
@@ -273,14 +325,15 @@ export class WarehouseController {
 
             return res.status(201).json({
                 success: true,
-                message: "Location created successfully",
-                data: location,
+                message: "Location created successfully.",
+                data: { location },
             });
         } catch (error: any) {
             console.error("Create location error:", error);
-            return res.status(400).json({
+            const { status, message } = handlePrismaError(error);
+            return res.status(status).json({
                 success: false,
-                message: error.message || "Failed to create location",
+                message,
             });
         }
     }
