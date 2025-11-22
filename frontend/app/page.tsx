@@ -1,7 +1,173 @@
-import { redirect } from "next/navigation";
+
+"use client"
+import Navbar from "@/components/landing/navbar"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
+import { Calendar, MapIcon, LucideIcon } from 'lucide-react'
+import Link from "next/link"
+import { redirect } from "next/navigation"
+import { useState, ReactNode } from "react"
 
 export default function Home() {
-  return <div>home page</div>;
+  const [isBannerVisible, setIsBannerVisible] = useState(true)
+
+  return (
+    <>
+      <Navbar />
+      <div
+        className={`min-h-screen bg-background text-white font-geist transition-all duration-300 pt-10 `}
+      >
+        <div className="max-w-[1450px] mx-auto relative px-6 md:px-8">
+          <section className="relative rounded-[16px] rounded-all-devices mt-16 mb-6 md:h-[calc(100vh-144px)] font-geist text-white flex flex-col">
+            {/* Gradient Background Image */}
+            <div className="absolute inset-0 w-full h-full overflow-hidden rounded-[16px]">
+              <div
+                className="absolute inset-0 w-full h-full rounded-[16px]"
+                style={{
+                  background: "linear-gradient(135deg, #22D3EE 0%, #FF5C28 50%, #FF5C9D 100%)",
+                }}
+              />
+              <div
+                className="absolute inset-0 w-full h-full rounded-[16px]"
+                style={{
+                  backgroundColor: "rgba(0, 0, 0, 0.35)",
+                }}
+              />
+            </div>
+
+            {/* Content */}
+            <div className="relative w-full px-4 sm:px-6 lg:px-8 text-center pt-[38px] sm:pt-[50px] pb-8 md:pt-[70px] md:pb-12 z-10 flex flex-col h-full">
+              {/* Mobile Layout (Stack: Text -> Image -> Buttons) */}
+              <div className="flex flex-col md:hidden">
+                <div className="mb-4">
+                  <h1
+                    className="font-semibold mb-2 overflow-visible select-text heading-with-selection"
+                    style={{
+                      fontSize: "clamp(36px, 8vw, 80px)",
+                      lineHeight: "1.1",
+                      letterSpacing: "-1.5px",
+                      fontFamily: 'var(--font-geist-sans), "GeistSans Fallback", sans-serif',
+                      color: "#FFFFFF",
+                      textShadow: "0 1px 2px rgba(0,0,0,0.3)",
+                    }}
+                    aria-label="StockMaker"
+                  >
+                    StockMaker
+                  </h1>
+                  <p
+                    className="mx-auto h-auto select-text mb-3"
+                    style={{
+                      fontFamily:
+                        'GeistMono, ui-monospace, SFMono-Regular, "Roboto Mono", Menlo, Monaco, "Liberation Mono", "DejaVu Sans Mono", "Courier New", monospace',
+                      fontSize: "clamp(14px, 4vw, 22px)",
+                      lineHeight: "1.3",
+                      fontWeight: "400",
+                      letterSpacing: "normal",
+                      maxWidth: "2xl",
+                      color: "#FFFFFF",
+                      backgroundColor: "transparent",
+                    }}
+                  >
+                    Simple stock & inventory management for your business.
+                  </p>
+                </div>
+
+                {/* Image in the middle for mobile */}
+                <div className="flex items-center justify-center mb-6">
+                  <div className="w-full">
+                    <HeroImage />
+                  </div>
+                </div>
+
+                {/* Buttons at the bottom for mobile */}
+                <div>
+                  <div className="flex flex-col gap-3 sm:gap-4 mb-4">
+                    <Link
+                      href="/register"
+                      className="bg-white hover:bg-gray-100 flex items-center justify-center px-4 sm:px-6 w-full rounded-lg shadow-lg font-mono text-xs sm:text-sm md:text-base font-semibold tracking-wider text-background h-[50px] sm:h-[60px] transition-colors"
+                    >
+                      Get Started Free
+                    </Link>
+                    <a
+                      href="#features"
+                      className="bg-background hover:bg-background/80 flex items-center justify-center px-4 sm:px-6 w-full rounded-lg shadow-lg font-mono text-xs sm:text-sm md:text-base font-semibold tracking-wider text-white h-[50px] sm:h-[60px] border border-white/10"
+                    >
+                      {/* <svg className="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                      </svg> */}
+                      See Features
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Desktop Layout (Original) */}
+              <div className="hidden md:flex md:flex-col md:flex-grow">
+                <h1
+                  className="font-semibold mb-2 whitespace-nowrap overflow-visible select-text heading-with-selection"
+                  style={{
+                    fontSize: "clamp(36px, 8vw, 80px)",
+                    lineHeight: "1.1",
+                    letterSpacing: "-1.5px",
+                    fontFamily: 'var(--font-geist-sans), "GeistSans Fallback", sans-serif',
+                    color: "#FFFFFF",
+                    textShadow: "0 1px 2px rgba(0,0,0,0.3)",
+                  }}
+                  aria-label="StockMaker"
+                >
+                  StockMaker
+                </h1>
+                <p
+                  className="mb-6 sm:mb-8 mx-auto h-auto select-text"
+                  style={{
+                    fontFamily:
+                      'GeistMono, ui-monospace, SFMono-Regular, "Roboto Mono", Menlo, Monaco, "Liberation Mono", "DejaVu Sans Mono", "Courier New", monospace',
+                    fontSize: "clamp(16px, 4vw, 22px)",
+                    lineHeight: "1.3",
+                    fontWeight: "400",
+                    letterSpacing: "normal",
+                    maxWidth: "2xl",
+                    color: "#FFFFFF",
+                    backgroundColor: "transparent",
+                  }}
+                >
+                  Simple stock & inventory management for your business.
+                </p>
+                <div className="flex flex-row justify-center gap-3 md:gap-4 mb-8">
+                  <Link
+                    href="/register"
+                    className="bg-white hover:bg-gray-100 flex items-center justify-center px-4 md:px-6 lg:px-8 rounded-lg shadow-lg font-mono text-sm md:text-base font-semibold tracking-wider text-background h-[50px] md:h-[60px] min-w-[180px] md:min-w-[220px] transition-colors"
+                  >
+                    Get Started Free
+                  </Link>
+                  <a
+                    href="#features"
+                    className="bg-background hover:bg-background/80 flex items-center justify-center px-4 md:px-6 lg:px-8 rounded-lg shadow-lg font-mono text-sm md:text-base font-semibold tracking-wider text-white h-[50px] md:h-[60px] min-w-[180px] md:min-w-[220px] border border-white/10"
+                  >
+                    {/* <svg className="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg> */}
+                    See Features
+                  </a>
+                </div>
+                <div className="relative w-full flex-grow flex items-center justify-center rounded-md overflow-hidden">
+                  <div className="w-full sm:w-[85%] md:max-w-[1200px] mx-auto">
+                    <HeroImage />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <Features />
+
+          <section >
+            <Footer />
+          </section>
+        </div>
+      </div>
+    </>
+  )
 }
 
 
