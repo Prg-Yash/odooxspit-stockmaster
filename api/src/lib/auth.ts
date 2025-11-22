@@ -39,16 +39,9 @@ function generateAccessToken(userId: string, email: string) {
 /**
  * Verify JWT access token
  */
-function verifyAccessToken(token: string): AuthTypes.JwtPayload | null {
+function verifyAccessToken(token: string) {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-
-    // jwt.verify can return a string for certain token types, we only want objects
-    if (typeof decoded === "string") {
-      return null;
-    }
-
-    return decoded as AuthTypes.JwtPayload;
+    return jwt.verify(token, JWT_SECRET);
   } catch (error) {
     return null;
   }
@@ -342,6 +335,136 @@ async function markPasswordResetTokenUsed(tokenId: string) {
   });
 }
 
+/**
+ * Generate a random 6-digit OTP
+ */
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+/**
+ * Create password reset OTP
+ */
+async function createPasswordResetOTP(userId: string, email: string) {
+  const otp = generateOTP();
+  const hashedOTP = hashToken(otp);
+  const expiresAt = new Date();
+  expiresAt.setMinutes(expiresAt.getMinutes() + 10); // 10 minutes
+
+  // Invalidate all previous OTPs for this user/email
+  await prisma.passwordResetOTP.deleteMany({
+    where: {
+      userId,
+      email,
+    },
+  });
+
+  await prisma.passwordResetOTP.create({
+    data: {
+      otp: hashedOTP,
+      userId,
+      email,
+      expiresAt,
+    },
+  });
+
+  return otp; // Return plain OTP to send via email
+}
+
+/**
+ * Verify password reset OTP
+ */
+async function verifyPasswordResetOTP(email: string, otp: string) {
+  const hashedOTP = hashToken(otp);
+
+  const otpRecord = await prisma.passwordResetOTP.findFirst({
+    where: {
+      email,
+      verified: false,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: { user: true },
+  });
+
+  if (!otpRecord) {
+    return { success: false, message: "Invalid OTP." };
+  }
+
+  // Check if OTP is expired
+  if (new Date() > otpRecord.expiresAt) {
+    return { success: false, message: "OTP has expired." };
+  }
+
+  // Check max attempts (5 attempts)
+  if (otpRecord.attempts >= 5) {
+    return {
+      success: false,
+      message: "Maximum attempts exceeded. Please request a new OTP.",
+    };
+  }
+
+  // Verify OTP
+  if (otpRecord.otp !== hashedOTP) {
+    // Increment attempts
+    await prisma.passwordResetOTP.update({
+      where: { id: otpRecord.id },
+      data: { attempts: otpRecord.attempts + 1 },
+    });
+    return {
+      success: false,
+      message: `Invalid OTP. ${4 - otpRecord.attempts} attempts remaining.`,
+    };
+  }
+
+  // Mark as verified
+  await prisma.passwordResetOTP.update({
+    where: { id: otpRecord.id },
+    data: { verified: true },
+  });
+
+  return { success: true, otpRecord };
+}
+
+/**
+ * Check if OTP is verified for password reset
+ */
+async function isOTPVerified(email: string) {
+  const otpRecord = await prisma.passwordResetOTP.findFirst({
+    where: {
+      email,
+      verified: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  if (!otpRecord) {
+    return false;
+  }
+
+  // Check if still within valid time (15 minutes after verification)
+  const validUntil = new Date(otpRecord.expiresAt);
+  validUntil.setMinutes(validUntil.getMinutes() + 15);
+
+  if (new Date() > validUntil) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Invalidate OTP after password reset
+ */
+async function invalidatePasswordResetOTP(email: string) {
+  await prisma.passwordResetOTP.deleteMany({
+    where: { email },
+  });
+}
+
 export {
   hashPassword,
   verifyPassword,
@@ -363,4 +486,8 @@ export {
   createPasswordResetToken,
   verifyPasswordResetToken,
   markPasswordResetTokenUsed,
+  createPasswordResetOTP,
+  verifyPasswordResetOTP,
+  isOTPVerified,
+  invalidatePasswordResetOTP,
 };

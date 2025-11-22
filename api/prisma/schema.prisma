@@ -27,6 +27,7 @@ model User {
   refreshTokens           RefreshToken[]
   emailVerificationTokens EmailVerificationToken[]
   passwordResetTokens     PasswordResetToken[]
+  passwordResetOTPs       PasswordResetOTP[]
   role                    UserRole
 }
 
@@ -76,4 +77,20 @@ model PasswordResetToken {
 
   @@index([userId])
   @@index([email])
+}
+
+model PasswordResetOTP {
+  id        String   @id @default(cuid())
+  otp       String   // Store hashed OTP
+  userId    String
+  email     String
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([email])
+  @@index([expiresAt])
 }
