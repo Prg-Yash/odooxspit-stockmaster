@@ -246,7 +246,6 @@ async function createEmailVerificationToken(userId: string, email: string) {
  */
 async function verifyEmailVerificationToken(token: string, email: string) {
   const hashedToken = hashToken(token);
-
   const verificationToken = await prisma.emailVerificationToken.findFirst({
     where: {
       token: hashedToken,

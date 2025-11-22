@@ -17,18 +17,11 @@ export class APIError extends Error {
 }
 
 /**
- * Get access token from cookies or localStorage (dev mode)
+ * Get access token from cookies
  */
 function getAccessToken(): string | null {
   if (typeof document === 'undefined') return null;
   
-  // Try localStorage first (for development)
-  const devToken = localStorage.getItem('devAccessToken');
-  if (devToken) {
-    return devToken;
-  }
-  
-  // Fallback to cookies
   const cookies = document.cookie.split(';');
   const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('accessToken='));
   
@@ -44,7 +37,7 @@ function getAccessToken(): string | null {
  */
 export async function apiRequest<T = any>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit & { body?: any } = {}
 ): Promise<T> {
   const token = getAccessToken();
   
@@ -63,12 +56,20 @@ export async function apiRequest<T = any>(
 
   const url = `${API_BASE_URL}${endpoint}`;
 
+  // Prepare the request body
+  const requestOptions: RequestInit = {
+    ...options,
+    headers,
+    credentials: 'include', // Include cookies
+  };
+
+  // Stringify body if it's an object and not already a string
+  if (options.body && typeof options.body === 'object') {
+    requestOptions.body = JSON.stringify(options.body);
+  }
+
   try {
-    const response = await fetch(url, {
-      ...options,
-      headers,
-      credentials: 'include', // Include cookies
-    });
+    const response = await fetch(url, requestOptions);
 
     const data = await response.json();
 

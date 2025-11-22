@@ -250,4 +250,61 @@ async function deleteAccount(
   }
 }
 
-export { getProfile, updateProfile, deleteAccount };
+/**
+ * Search users by email (for adding to warehouse)
+ */
+async function searchUsers(req: Request, res: Response) {
+  try {
+    const { email } = req.query;
+
+    if (!email || typeof email !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Email query parameter is required",
+      });
+    }
+
+    // Search for users by email (case-insensitive, partial match)
+    const users = await prisma.user.findMany({
+      where: {
+        email: {
+          contains: email,
+          mode: "insensitive",
+        },
+        emailVerified: true, // Only return verified users
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        warehouseMemberships: {
+          select: {
+            warehouse: {
+              select: {
+                id: true,
+                name: true,
+                code: true,
+              },
+            },
+            role: true,
+          },
+        },
+      },
+      take: 10, // Limit results
+    });
+
+    res.status(200).json({
+      success: true,
+      data: { users },
+    });
+  } catch (error) {
+    console.error("Search users error:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while searching users.",
+    });
+  }
+}
+
+export { getProfile, updateProfile, deleteAccount, searchUsers };
