@@ -388,6 +388,7 @@ export const ModelName = {
   RefreshToken: 'RefreshToken',
   EmailVerificationToken: 'EmailVerificationToken',
   PasswordResetToken: 'PasswordResetToken',
+  PasswordResetOTP: 'PasswordResetOTP',
   Warehouse: 'Warehouse',
   WarehouseMember: 'WarehouseMember',
   Location: 'Location',
@@ -410,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "emailVerificationToken" | "passwordResetToken" | "warehouse" | "warehouseMember" | "location" | "productCategory" | "product" | "stockLevel" | "stockMovement"
+    modelProps: "user" | "refreshToken" | "emailVerificationToken" | "passwordResetToken" | "passwordResetOTP" | "warehouse" | "warehouseMember" | "location" | "productCategory" | "product" | "stockLevel" | "stockMovement"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -707,6 +708,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PasswordResetTokenCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PasswordResetTokenCountAggregateOutputType> | number
+        }
+      }
+    }
+    PasswordResetOTP: {
+      payload: Prisma.$PasswordResetOTPPayload<ExtArgs>
+      fields: Prisma.PasswordResetOTPFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PasswordResetOTPFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetOTPPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PasswordResetOTPFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetOTPPayload>
+        }
+        findFirst: {
+          args: Prisma.PasswordResetOTPFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetOTPPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PasswordResetOTPFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetOTPPayload>
+        }
+        findMany: {
+          args: Prisma.PasswordResetOTPFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetOTPPayload>[]
+        }
+        create: {
+          args: Prisma.PasswordResetOTPCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetOTPPayload>
+        }
+        createMany: {
+          args: Prisma.PasswordResetOTPCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PasswordResetOTPCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetOTPPayload>[]
+        }
+        delete: {
+          args: Prisma.PasswordResetOTPDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetOTPPayload>
+        }
+        update: {
+          args: Prisma.PasswordResetOTPUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetOTPPayload>
+        }
+        deleteMany: {
+          args: Prisma.PasswordResetOTPDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PasswordResetOTPUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PasswordResetOTPUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetOTPPayload>[]
+        }
+        upsert: {
+          args: Prisma.PasswordResetOTPUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetOTPPayload>
+        }
+        aggregate: {
+          args: Prisma.PasswordResetOTPAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePasswordResetOTP>
+        }
+        groupBy: {
+          args: Prisma.PasswordResetOTPGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PasswordResetOTPGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PasswordResetOTPCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PasswordResetOTPCountAggregateOutputType> | number
         }
       }
     }
@@ -1326,6 +1401,20 @@ export const PasswordResetTokenScalarFieldEnum = {
 export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
 
 
+export const PasswordResetOTPScalarFieldEnum = {
+  id: 'id',
+  otp: 'otp',
+  userId: 'userId',
+  email: 'email',
+  expiresAt: 'expiresAt',
+  verified: 'verified',
+  attempts: 'attempts',
+  createdAt: 'createdAt'
+} as const
+
+export type PasswordResetOTPScalarFieldEnum = (typeof PasswordResetOTPScalarFieldEnum)[keyof typeof PasswordResetOTPScalarFieldEnum]
+
+
 export const WarehouseScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -1510,6 +1599,20 @@ export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
 
 
 /**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Int[]'
+ */
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
  * Reference to a field of type 'WarehouseMemberRole'
  */
 export type EnumWarehouseMemberRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WarehouseMemberRole'>
@@ -1534,20 +1637,6 @@ export type EnumUnitOfMeasureFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'UnitOfMeasure[]'
  */
 export type ListEnumUnitOfMeasureFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UnitOfMeasure[]'>
-    
-
-
-/**
- * Reference to a field of type 'Int'
- */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-/**
- * Reference to a field of type 'Int[]'
- */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -1661,6 +1750,7 @@ export type GlobalOmitConfig = {
   refreshToken?: Prisma.RefreshTokenOmit
   emailVerificationToken?: Prisma.EmailVerificationTokenOmit
   passwordResetToken?: Prisma.PasswordResetTokenOmit
+  passwordResetOTP?: Prisma.PasswordResetOTPOmit
   warehouse?: Prisma.WarehouseOmit
   warehouseMember?: Prisma.WarehouseMemberOmit
   location?: Prisma.LocationOmit

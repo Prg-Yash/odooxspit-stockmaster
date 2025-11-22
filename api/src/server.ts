@@ -88,8 +88,9 @@ app.use(
 );
 
 // Start server
-app.listen(process.env.PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${process.env.PORT}`);
+const PORT = parseInt(process.env.PORT || "4000");
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on http://localhost:${PORT}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || "development"}`);
   console.log(`📧 SMTP configured: ${process.env.SMTP_USER ? "Yes" : "No"}`);
 });

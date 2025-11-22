@@ -55,6 +55,7 @@ export const ModelName = {
   RefreshToken: 'RefreshToken',
   EmailVerificationToken: 'EmailVerificationToken',
   PasswordResetToken: 'PasswordResetToken',
+  PasswordResetOTP: 'PasswordResetOTP',
   Warehouse: 'Warehouse',
   WarehouseMember: 'WarehouseMember',
   Location: 'Location',
@@ -137,6 +138,20 @@ export const PasswordResetTokenScalarFieldEnum = {
 } as const
 
 export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
+
+
+export const PasswordResetOTPScalarFieldEnum = {
+  id: 'id',
+  otp: 'otp',
+  userId: 'userId',
+  email: 'email',
+  expiresAt: 'expiresAt',
+  verified: 'verified',
+  attempts: 'attempts',
+  createdAt: 'createdAt'
+} as const
+
+export type PasswordResetOTPScalarFieldEnum = (typeof PasswordResetOTPScalarFieldEnum)[keyof typeof PasswordResetOTPScalarFieldEnum]
 
 
 export const WarehouseScalarFieldEnum = {

@@ -1,22 +1,38 @@
 import express from "express";
 import {
-  deleteAccount,
-  getProfile,
-  updateProfile,
-} from "~/controllers/user.controller";
-import { requireAuth } from "~/middlewares/require-auth";
+  login,
+  logout,
+  refreshToken,
+  register,
+  requestPasswordReset,
+  resendVerificationEmail,
+  resetPassword,
+  verifyEmail,
+} from "~/controllers/auth.controller";
 
 const userRouter = express.Router();
 
-userRouter.use(requireAuth);
+userRouter.post("/register", register);
 
-// Get current user profile
-userRouter.get("/me", getProfile);
+// Verify email
+userRouter.get("/verify-email", verifyEmail);
 
-// Update user profile
-userRouter.put("/update", updateProfile);
+// Resend verification email
+userRouter.post("/resend-verification-email", resendVerificationEmail);
 
-// Delete user account
-userRouter.delete("/delete", deleteAccount);
+// Login
+userRouter.post("/login", login);
+
+// Refresh access token
+userRouter.post("/refresh-token", refreshToken);
+
+// Logout
+userRouter.post("/logout", logout);
+
+// Request password reset
+userRouter.post("/request-password-reset", requestPasswordReset);
+
+// Reset password
+userRouter.post("/reset-password", resetPassword);
 
 export { userRouter };
