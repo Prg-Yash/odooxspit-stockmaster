@@ -64,3 +64,63 @@ export type PasswordResetToken = Prisma.PasswordResetTokenModel
  * 
  */
 export type PasswordResetOTP = Prisma.PasswordResetOTPModel
+/**
+ * Model Warehouse
+ * 
+ */
+export type Warehouse = Prisma.WarehouseModel
+/**
+ * Model WarehouseMember
+ * 
+ */
+export type WarehouseMember = Prisma.WarehouseMemberModel
+/**
+ * Model Location
+ * 
+ */
+export type Location = Prisma.LocationModel
+/**
+ * Model ProductCategory
+ * 
+ */
+export type ProductCategory = Prisma.ProductCategoryModel
+/**
+ * Model Product
+ * 
+ */
+export type Product = Prisma.ProductModel
+/**
+ * Model StockLevel
+ * 
+ */
+export type StockLevel = Prisma.StockLevelModel
+/**
+ * Model StockMovement
+ * 
+ */
+export type StockMovement = Prisma.StockMovementModel
+/**
+ * Model Vendor
+ * 
+ */
+export type Vendor = Prisma.VendorModel
+/**
+ * Model Receipt
+ * 
+ */
+export type Receipt = Prisma.ReceiptModel
+/**
+ * Model ReceiptItem
+ * 
+ */
+export type ReceiptItem = Prisma.ReceiptItemModel
+/**
+ * Model Delivery
+ * 
+ */
+export type Delivery = Prisma.DeliveryModel
+/**
+ * Model DeliveryItem
+ * 
+ */
+export type DeliveryItem = Prisma.DeliveryItemModel

@@ -7,52 +7,68 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeft } from "lucide-react"
-import type { Product } from "@/app/page"
+import { ArrowLeft, Loader2 } from "lucide-react"
+import { createProduct, type Product } from "@/lib/api/product"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 interface CreateProductPageProps {
-  onProductCreate: (product: Product) => void
+  warehouseId: string
 }
 
-export function CreateProductPage({ onProductCreate }: CreateProductPageProps) {
+export function CreateProductPage({ warehouseId }: CreateProductPageProps) {
+  const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     sku: "",
-    category: "",
+    categoryId: "",
     price: "",
-    quantity: "",
+    reorderLevel: "",
     description: "",
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (formData.name && formData.sku) {
-      const newProduct: Product = {
-        id: Date.now().toString(),
+
+    if (!formData.name || !formData.sku) {
+      toast.error("Product name and SKU are required")
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const response = await createProduct(warehouseId, {
         name: formData.name,
         sku: formData.sku,
-        category: formData.category,
-        price: Number.parseFloat(formData.price),
-        quantity: Number.parseInt(formData.quantity),
-        description: formData.description,
-        createdAt: new Date().toISOString().split("T")[0],
-        history: [
-          {
-            id: "h" + Date.now(),
-            action: "created",
-            quantity: Number.parseInt(formData.quantity),
-            previousQuantity: 0,
-            date: new Date().toISOString().split("T")[0],
-          },
-        ],
+        description: formData.description || undefined,
+        categoryId: formData.categoryId || undefined,
+        reorderLevel: formData.reorderLevel ? Number.parseInt(formData.reorderLevel) : 0,
+        price: formData.price ? Number.parseFloat(formData.price) : undefined,
+      })
+
+      if (response.success) {
+        toast.success("Product created successfully")
+        router.push("/dashboard/products")
+      } else {
+        throw new Error(response.message || "Failed to create product")
       }
-      onProductCreate(newProduct)
+    } catch (error: any) {
+      console.error("Error creating product:", error)
+      toast.error(error.message || "Failed to create product")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   return (
     <div className="space-y-4 md:space-y-6 animate-fade-in">
-      <Button variant="outline" className="gap-2 border-2 w-full sm:w-auto bg-transparent">
+      <Button
+        variant="outline"
+        className="gap-2 border-2 w-full sm:w-auto bg-transparent"
+        onClick={() => router.push("/dashboard/products")}
+      >
         <ArrowLeft size={18} /> Back to Products
       </Button>
 
@@ -86,12 +102,12 @@ export function CreateProductPage({ onProductCreate }: CreateProductPageProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="categoryId">Category ID (optional)</Label>
                 <Input
-                  id="category"
-                  placeholder="Enter category"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  id="categoryId"
+                  placeholder="Enter category ID"
+                  value={formData.categoryId}
+                  onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                   className="border-2"
                 />
               </div>
@@ -108,14 +124,15 @@ export function CreateProductPage({ onProductCreate }: CreateProductPageProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="quantity">Initial Quantity</Label>
+                <Label htmlFor="reorderLevel">Reorder Level</Label>
                 <Input
-                  id="quantity"
+                  id="reorderLevel"
                   type="number"
-                  placeholder="Enter quantity"
-                  value={formData.quantity}
-                  onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                  placeholder="Enter reorder level"
+                  value={formData.reorderLevel}
+                  onChange={(e) => setFormData({ ...formData, reorderLevel: e.target.value })}
                   className="border-2"
+                  min="0"
                 />
               </div>
             </div>
@@ -131,10 +148,27 @@ export function CreateProductPage({ onProductCreate }: CreateProductPageProps) {
               />
             </div>
             <div className="flex gap-2 pt-4">
-              <Button type="submit" className="bg-accent hover:bg-accent/90 flex-1 sm:flex-none">
-                Create Product
+              <Button
+                type="submit"
+                className="bg-accent hover:bg-accent/90 flex-1 sm:flex-none"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  "Create Product"
+                )}
               </Button>
-              <Button type="button" variant="outline" className="border-2 flex-1 sm:flex-none bg-transparent">
+              <Button
+                type="button"
+                variant="outline"
+                className="border-2 flex-1 sm:flex-none bg-transparent"
+                onClick={() => router.push("/dashboard/products")}
+                disabled={isSubmitting}
+              >
                 Cancel
               </Button>
             </div>

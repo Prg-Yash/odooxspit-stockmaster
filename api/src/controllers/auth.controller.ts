@@ -39,28 +39,34 @@ import {
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: true,
+  sameSite: "lax" as const,
   maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
 };
 
 async function register(req: Request, res: Response) {
   try {
-    const { success, data } = AuthTypes.SRegister.safeParse(req.body);
+    const result = AuthTypes.SRegister.safeParse(req.body);
 
-    if (!success)
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid or missing data." });
+    if (!result.success) {
+      const errors = result.error.issues.map(e => e.message).join(", ");
+      return res.status(400).json({
+        success: false,
+        message: errors || "Validation failed."
+      });
+    }
+
+    const data = result.data;
 
     const existingUser = await prisma.user.findUnique({
       where: { email: data.email },
     });
 
-    if (existingUser)
-      return res.status(400).json({
+    if (existingUser) {
+      return res.status(409).json({
         success: false,
         message: "User with this email already exists.",
       });
+    }
 
     const hashedPassword = await hashPassword(data.password);
 
@@ -73,8 +79,8 @@ async function register(req: Request, res: Response) {
           data.role === "owner"
             ? UserRole.OWNER
             : data.role === "manager"
-            ? UserRole.MANAGER
-            : UserRole.STAFF,
+              ? UserRole.MANAGER
+              : UserRole.STAFF,
       },
     });
 
@@ -84,8 +90,6 @@ async function register(req: Request, res: Response) {
       data.email
     );
 
-    // Send verification email
-    console.log(`📧 Sending verification email to: ${data.email}`);
     await sendVerificationEmail(data.email, verificationToken);
 
     res.status(201).json({
@@ -93,9 +97,12 @@ async function register(req: Request, res: Response) {
       message:
         "User registered successfully. Please check your email to verify your account.",
       data: {
-        userId: user.id,
-        email: user.email,
-        name: user.name,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        },
       },
     });
   } catch (error) {
@@ -115,10 +122,9 @@ async function verifyEmail(req: Request, res: Response) {
     const { token, email } = req.query;
 
     if (!token || !email) {
-      return res.status(400).json({
-        success: false,
-        message: "Token and email are required.",
-      });
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/verify/error?reason=missing_params`
+      );
     }
 
     // Verify token
@@ -128,10 +134,9 @@ async function verifyEmail(req: Request, res: Response) {
     );
 
     if (!verificationToken) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid or expired verification token.",
-      });
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/verify/error?reason=invalid_or_expired`
+      );
     }
 
     // Update user's emailVerified status
@@ -149,16 +154,12 @@ async function verifyEmail(req: Request, res: Response) {
       verificationToken.user.name as string
     );
 
-    res.status(200).json({
-      success: true,
-      message: "Email verified successfully. You can now log in.",
-    });
+    return res.redirect(`${process.env.FRONTEND_URL}/verify/success`);
   } catch (error) {
     console.error("Verify email error:", error);
-    res.status(500).json({
-      success: false,
-      message: "An error occurred during email verification.",
-    });
+    return res.redirect(
+      `${process.env.FRONTEND_URL}/verify/error?reason=internal_server_error`
+    );
   }
 }
 
@@ -211,7 +212,7 @@ async function login(req: Request, res: Response) {
     const accessToken = generateAccessToken(user.id, user.email);
 
     // Extract session metadata
-    const userAgent = (req.headers["x-forwarded-for"] as string) || "";
+    const userAgent = req.headers["user-agent"] || "";
     const ipAddress = getClientIp(req);
     const deviceInfo = parseUserAgent(userAgent);
     const deviceName = generateDeviceName(
@@ -230,7 +231,7 @@ async function login(req: Request, res: Response) {
       os: deviceInfo.os,
     });
 
-    // Set refresh token in cookie
+    res.cookie("accessToken", accessToken, COOKIE_OPTIONS);
     res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
 
     res.status(200).json({
@@ -243,6 +244,7 @@ async function login(req: Request, res: Response) {
           id: user.id,
           email: user.email,
           name: user.name,
+          role: user.role,
           emailVerified: user.emailVerified,
         },
       },

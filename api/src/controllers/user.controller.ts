@@ -250,4 +250,125 @@ async function deleteAccount(
   }
 }
 
-export { getProfile, updateProfile, deleteAccount };
+/**
+ * Search users by email (for adding to warehouse)
+ */
+async function searchUsers(req: Request, res: Response) {
+  try {
+    const { email } = req.query;
+
+    if (!email || typeof email !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Email query parameter is required",
+      });
+    }
+
+    // Search for users by email (case-insensitive, partial match)
+    const users = await prisma.user.findMany({
+      where: {
+        email: {
+          contains: email,
+          mode: "insensitive",
+        },
+        emailVerified: true, // Only return verified users
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        warehouseMemberships: {
+          select: {
+            warehouse: {
+              select: {
+                id: true,
+                name: true,
+                code: true,
+              },
+            },
+            role: true,
+          },
+        },
+      },
+      take: 10, // Limit results
+    });
+
+    res.status(200).json({
+      success: true,
+      data: { users },
+    });
+  } catch (error) {
+    console.error("Search users error:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while searching users.",
+    });
+  }
+}
+
+/**
+ * Get all employees with warehouse assignments
+ * Only accessible by OWNER role
+ */
+async function getAllEmployees(req: Request, res: Response) {
+  try {
+    // Check if user is OWNER
+    if (req.user.role !== "OWNER") {
+      return res.status(403).json({
+        success: false,
+        message: "Only owners can view all employees.",
+      });
+    }
+
+    // Get all users with their warehouse memberships
+    const employees = await prisma.user.findMany({
+      where: {
+        emailVerified: true,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        createdAt: true,
+        warehouseMemberships: {
+          select: {
+            id: true,
+            role: true,
+            warehouse: {
+              select: {
+                id: true,
+                name: true,
+                code: true,
+                city: true,
+                state: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: [
+        {
+          role: "asc", // OWNER first, then MANAGER, then STAFF
+        },
+        {
+          createdAt: "asc",
+        },
+      ],
+    });
+
+    res.status(200).json({
+      success: true,
+      data: { employees },
+    });
+  } catch (error) {
+    console.error("Get all employees error:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching employees.",
+    });
+  }
+}
+
+export { getProfile, updateProfile, deleteAccount, searchUsers, getAllEmployees };

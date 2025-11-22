@@ -1,38 +1,25 @@
 import express from "express";
-import {
-  login,
-  logout,
-  refreshToken,
-  register,
-  requestPasswordReset,
-  resendVerificationEmail,
-  resetPassword,
-  verifyEmail,
-} from "~/controllers/auth.controller";
+import { requireAuth } from "~/middlewares/require-auth";
+import { getProfile, updateProfile, deleteAccount, searchUsers, getAllEmployees } from "~/controllers/user.controller";
 
 const userRouter = express.Router();
 
-userRouter.post("/register", register);
+// All user routes require authentication
+userRouter.use(requireAuth);
 
-// Verify email
-userRouter.get("/verify-email", verifyEmail);
+// Get current user profile
+userRouter.get("/me", getProfile);
 
-// Resend verification email
-userRouter.post("/resend-verification-email", resendVerificationEmail);
+// Get all employees with warehouse assignments (OWNER only)
+userRouter.get("/employees", getAllEmployees);
 
-// Login
-userRouter.post("/login", login);
+// Update user profile
+userRouter.put("/update", updateProfile);
 
-// Refresh access token
-userRouter.post("/refresh-token", refreshToken);
+// Delete user account
+userRouter.delete("/delete", deleteAccount);
 
-// Logout
-userRouter.post("/logout", logout);
-
-// Request password reset
-userRouter.post("/request-password-reset", requestPasswordReset);
-
-// Reset password
-userRouter.post("/reset-password", resetPassword);
+// Search users by email (for warehouse member invitation)
+userRouter.get("/search", searchUsers);
 
 export { userRouter };

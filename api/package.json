@@ -6,21 +6,31 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsup",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:e2e": "NODE_ENV=test vitest run",
+    "test:coverage": "vitest run --coverage",
+    "seed": "tsx tests/setup/seed.ts"
   },
   "devDependencies": {
-    "@types/node": "latest",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "latest",
     "@types/nodemailer": "^7.0.4",
     "@types/pg": "^8.15.6",
+    "@types/supertest": "^6.0.3",
+    "@vitest/ui": "^4.0.13",
     "nodemon": "^3.1.11",
     "prisma": "^7.0.0",
+    "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
     "tsup": "^8.5.1",
-    "tsx": "^4.20.6"
+    "tsx": "^4.20.6",
+    "vitest": "^4.0.13"
   },
   "peerDependencies": {
     "typescript": "^5"
