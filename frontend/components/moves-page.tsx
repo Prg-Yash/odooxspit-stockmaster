@@ -4,8 +4,9 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, ArrowRight, GripHorizontal } from "lucide-react"
-import type { MoveRecord, Product, Warehouse, Vendor } from "@/app/page"
+import { ArrowRight, GripHorizontal } from "lucide-react"
+import { MoveHistoryDialog } from "@/components/dialogs/move-history-dialog"
+import type { MoveRecord, Product, Warehouse, Vendor } from "@/types"
 
 interface MovesPageProps {
   moveRecords: MoveRecord[]
@@ -17,16 +18,7 @@ interface MovesPageProps {
 
 export function MovesPage({ moveRecords, setMoveRecords, products, warehouses, vendors }: MovesPageProps) {
   const [filterStatus, setFilterStatus] = useState<"all" | MoveRecord["status"]>("all")
-  const [showForm, setShowForm] = useState(false)
   const [draggedItem, setDraggedItem] = useState<MoveRecord | null>(null)
-  const [formData, setFormData] = useState({
-    productId: "",
-    quantity: "",
-    fromLocation: "",
-    toLocation: "",
-    moveType: "in-warehouse" as const,
-    vendorId: "",
-  })
 
   const filteredMoves = moveRecords.filter((move) => (filterStatus === "all" ? true : move.status === filterStatus))
 
@@ -100,13 +92,13 @@ export function MovesPage({ moveRecords, setMoveRecords, products, warehouses, v
                         className="p-3 bg-card rounded-lg border border-border hover:shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing animate-scale-in"
                       >
                         <div className="flex items-start gap-2">
-                          <GripHorizontal size={16} className="text-muted-foreground flex-shrink-0 mt-0.5" />
+                          <GripHorizontal size={16} className="text-muted-foreground shrink-0 mt-0.5" />
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-sm text-foreground truncate">{move.productName}</p>
                             <p className="text-xs text-muted-foreground mb-2">{move.sku}</p>
                             <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
                               <span className="truncate">{move.fromLocation}</span>
-                              <ArrowRight size={12} className="flex-shrink-0" />
+                              <ArrowRight size={12} className="shrink-0" />
                               <span className="truncate">{move.toLocation}</span>
                             </div>
                             <div className="flex justify-between items-center">
@@ -139,12 +131,9 @@ export function MovesPage({ moveRecords, setMoveRecords, products, warehouses, v
             </Button>
           ))}
         </div>
-        <Button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-accent hover:bg-accent/90 text-accent-foreground gap-2 whitespace-nowrap w-full md:w-auto"
-        >
-          <Plus size={18} /> Create Move
-        </Button>
+        <div className="w-full md:w-auto">
+          <MoveHistoryDialog />
+        </div>
       </div>
 
       {/* Moves Table */}

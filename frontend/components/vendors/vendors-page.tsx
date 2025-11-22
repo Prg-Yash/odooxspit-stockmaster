@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Plus, Edit2, Trash2, Search, Mail, Phone, MapPin } from "lucide-react"
-import type { Vendor } from "@/app/page"
+import type { Vendor } from "@/types"
 
 interface VendorsPageProps {
   vendors: Vendor[]
@@ -228,14 +228,14 @@ export function VendorsPage({ vendors, setVendors }: VendorsPageProps) {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center gap-2 text-sm">
-                <Mail size={16} className="text-muted-foreground flex-shrink-0" />
+                <Mail size={16} className="text-muted-foreground shrink-0" />
                 <a href={`mailto:${vendor.email}`} className="text-primary hover:underline truncate">
                   {vendor.email}
                 </a>
               </div>
               {vendor.phone && (
                 <div className="flex items-center gap-2 text-sm">
-                  <Phone size={16} className="text-muted-foreground flex-shrink-0" />
+                  <Phone size={16} className="text-muted-foreground shrink-0" />
                   <a href={`tel:${vendor.phone}`} className="text-primary hover:underline">
                     {vendor.phone}
                   </a>
@@ -243,7 +243,7 @@ export function VendorsPage({ vendors, setVendors }: VendorsPageProps) {
               )}
               {vendor.address && (
                 <div className="flex items-start gap-2 text-sm">
-                  <MapPin size={16} className="text-muted-foreground flex-shrink-0 mt-0.5" />
+                  <MapPin size={16} className="text-muted-foreground shrink-0 mt-0.5" />
                   <div>
                     <p className="text-foreground">{vendor.address}</p>
                     <p className="text-muted-foreground">

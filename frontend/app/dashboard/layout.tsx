@@ -1,13 +1,17 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
-import { Sidebar } from "@/components/sidebar"
+import { useRouter } from "next/navigation"
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
+import { Separator } from "@/components/ui/separator"
+import { PageTransition } from "@/components/page-transition"
+import { Loader2 } from "lucide-react"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const pathname = usePathname()
-  const [user, setUser] = useState<{ email: string } | null>(null)
+  const [user, setUser] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const userData = localStorage.getItem("user")
@@ -16,21 +20,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     } else {
       setUser(JSON.parse(userData))
     }
+    setIsLoading(false)
   }, [router])
 
-  const handleLogout = () => {
-    localStorage.removeItem("user")
-    router.push("/login")
-  }
-
-  const handlePageChange = (page: string) => {
-    router.push(`/dashboard/${page === "dashboard" ? "" : page}`)
-  }
-
-  const getCurrentPage = () => {
-    const segments = pathname.split("/").filter(Boolean)
-    if (segments.length === 1) return "dashboard"
-    return segments.slice(1).join("/")
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    )
   }
 
   if (!user) {
@@ -38,25 +36,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
-      <Sidebar currentPage={getCurrentPage()} onPageChange={handlePageChange} onLogout={handleLogout} />
-      <main className="flex-1 overflow-auto">
-        <div className="p-4 md:p-6 lg:p-8">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 md:mb-8">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground text-balance">
-                {getCurrentPage()
-                  .split("/")
-                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(" ")
-                  .replace(/-/g, " ")}
-              </h1>
-              <p className="text-muted-foreground text-sm mt-1">Welcome back, {user?.email}</p>
-            </div>
+    <SidebarProvider defaultOpen>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Separator orientation="vertical" className="mr-2 h-4" />
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              Welcome back, {user?.name || user?.email || "User"}
+            </span>
           </div>
-          {children}
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4 md:p-6 lg:p-8">
+          <PageTransition>{children}</PageTransition>
         </div>
-      </main>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

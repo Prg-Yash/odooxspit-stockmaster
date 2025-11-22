@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, ReactNode } from "react"
-import { Product, Vendor, Warehouse, MoveRecord } from "./types"
+import { Product, Vendor, Warehouse, MoveRecord } from "@/types"
 
 interface StoreContextType {
   products: Product[]

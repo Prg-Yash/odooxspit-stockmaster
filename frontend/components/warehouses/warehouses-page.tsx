@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Plus, Trash2, Edit2, AlertCircle } from "lucide-react"
-import type { Warehouse } from "@/app/page"
+import type { Warehouse } from "@/types"
 
 interface WarehousesPageProps {
   warehouses: Warehouse[]
@@ -204,7 +204,7 @@ export function WarehousesPage({ warehouses, setWarehouses }: WarehousesPageProp
 
                 {isNearCapacity && (
                   <div className="flex items-center gap-2 p-2 bg-destructive/10 rounded border border-destructive/30">
-                    <AlertCircle size={16} className="text-destructive flex-shrink-0" />
+                    <AlertCircle size={16} className="text-destructive shrink-0" />
                     <span className="text-xs text-destructive">Near capacity</span>
                   </div>
                 )}

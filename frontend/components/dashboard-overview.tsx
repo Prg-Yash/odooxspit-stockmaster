@@ -1,9 +1,12 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
+import { ChartContainer } from "@/components/ui/chart"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { Drawer, DrawerTrigger, DrawerContent, DrawerTitle, DrawerDescription, DrawerFooter } from "@/components/ui/drawer"
 import { Package, AlertTriangle, Warehouse, Activity } from "lucide-react"
-import type { MoveRecord } from "@/app/page"
+import type { MoveRecord } from "@/types"
 
 interface DashboardOverviewProps {
   moveRecords: MoveRecord[]
@@ -86,28 +89,32 @@ export function DashboardOverview({ moveRecords }: DashboardOverviewProps) {
         </Card>
       </div>
 
-      {/* Charts */}
+      {/* Charts (shadcn/ui) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <Card className="border-2">
           <CardHeader>
             <CardTitle className="text-base md:text-lg">Inventory Levels</CardTitle>
           </CardHeader>
           <CardContent className="overflow-x-auto">
-            <ResponsiveContainer width="100%" height={300} minWidth={250}>
-              <BarChart data={inventoryData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "var(--card)",
-                    border: "2px solid var(--border)",
-                    borderRadius: "var(--radius)",
-                  }}
-                />
-                <Bar dataKey="value" fill="var(--chart-1)" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <ChartContainer
+              config={{ value: { color: 'var(--chart-1)', label: 'Inventory' } }}
+              // @ts-expect-error shadcn/ui chart expects function child
+              children={({ BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip }: any) => (
+                <BarChart data={inventoryData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "var(--card)",
+                      border: "2px solid var(--border)",
+                      borderRadius: "var(--radius)",
+                    }}
+                  />
+                  <Bar dataKey="value" fill="var(--chart-1)" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              )}
+            />
           </CardContent>
         </Card>
 
@@ -116,36 +123,97 @@ export function DashboardOverview({ moveRecords }: DashboardOverviewProps) {
             <CardTitle className="text-base md:text-lg">Stock Movement</CardTitle>
           </CardHeader>
           <CardContent className="overflow-x-auto">
-            <ResponsiveContainer width="100%" height={300} minWidth={250}>
-              <LineChart data={movementData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "var(--card)",
-                    border: "2px solid var(--border)",
-                    borderRadius: "var(--radius)",
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="in"
-                  stroke="var(--chart-1)"
-                  strokeWidth={2}
-                  dot={{ fill: "var(--chart-1)" }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="out"
-                  stroke="var(--chart-2)"
-                  strokeWidth={2}
-                  dot={{ fill: "var(--chart-2)" }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <ChartContainer
+              config={{ in: { color: 'var(--chart-1)', label: 'In' }, out: { color: 'var(--chart-2)', label: 'Out' } }}
+              // @ts-expect-error shadcn/ui chart expects function child
+              children={({ LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip }: any) => (
+                <LineChart data={movementData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "var(--card)",
+                      border: "2px solid var(--border)",
+                      borderRadius: "var(--radius)"
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="in"
+                    stroke="var(--chart-1)"
+                    strokeWidth={2}
+                    dot={{ fill: "var(--chart-1)" }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="out"
+                    stroke="var(--chart-2)"
+                    strokeWidth={2}
+                    dot={{ fill: "var(--chart-2)" }}
+                  />
+                </LineChart>
+              )}
+            />
           </CardContent>
         </Card>
+      </div>
+
+      {/* Actions */}
+      <div className="flex flex-wrap gap-2 my-4">
+        <Drawer>
+          <DrawerTrigger asChild>
+            <Button variant="default">Create</Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <DrawerTitle>Create Item</DrawerTitle>
+            <DrawerDescription>Fill the form to create a new item.</DrawerDescription>
+            {/* TODO: Add shadcn/ui Form here */}
+            <DrawerFooter>
+              <Button type="submit">Submit</Button>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="destructive">Delete</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogTitle>Delete Item</DialogTitle>
+            <DialogDescription>Are you sure you want to delete this item?</DialogDescription>
+            <DialogFooter>
+              <Button variant="secondary">Cancel</Button>
+              <Button variant="destructive">Delete</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Validate</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogTitle>Validate Item</DialogTitle>
+            <DialogDescription>Are you sure you want to validate this item?</DialogDescription>
+            <DialogFooter>
+              <Button variant="secondary">Cancel</Button>
+              <Button variant="default">Validate</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Filter</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogTitle>Filter Items</DialogTitle>
+            <DialogDescription>Set your filter options below.</DialogDescription>
+            {/* TODO: Add shadcn/ui Form for filters here */}
+            <DialogFooter>
+              <Button variant="secondary">Cancel</Button>
+              <Button variant="default">Apply</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Recent Moves Preview */}

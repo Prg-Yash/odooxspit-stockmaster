@@ -32,7 +32,7 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
     <Card className="w-full max-w-md border-2 shadow-lg animate-scale-in">
       <CardHeader className="space-y-2 border-b border-border pb-4 md:pb-6">
         <div className="flex items-center gap-2 mb-2 md:mb-4">
-          <div className="w-8 h-8 md:w-10 md:h-10 bg-accent rounded-lg flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 md:w-10 md:h-10 bg-accent rounded-lg flex items-center justify-center shrink-0">
             <span className="text-accent-foreground font-bold text-sm md:text-base">S</span>
           </div>
           <span className="text-lg md:text-xl font-bold text-foreground">StockMaster</span>

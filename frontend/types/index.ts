@@ -1,3 +1,5 @@
+export * from "./auth"
+
 export interface Product {
   id: string
   name: string
@@ -36,6 +38,7 @@ export interface Warehouse {
   location: string
   capacity: number
   usedCapacity: number
+  managerId?: string
   locations: WarehouseLocation[]
 }
 
