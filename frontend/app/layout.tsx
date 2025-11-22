@@ -19,24 +19,7 @@ export const metadata: Metadata = {
   generator: "v0.app",
   keywords:
     "inventory management, warehouse management, stock tracking, supply chain",
-  authors: [{ name: "StockMaster" }],
-  icons: {
-    icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
-    apple: "/apple-icon.png",
-  },
+  authors: [{ name: "StockMaster" }]
 };
 
 export const viewport: Viewport = {
