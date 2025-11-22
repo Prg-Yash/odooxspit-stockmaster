@@ -4,10 +4,9 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Plus, Trash2, Edit2, AlertCircle } from "lucide-react"
+import { Trash2, Edit2, AlertCircle } from "lucide-react"
 import type { Warehouse } from "@/types"
+import { WarehouseDialog } from "@/components/dialogs/warehouse-dialog"
 
 interface WarehousesPageProps {
   warehouses: Warehouse[]
@@ -15,59 +14,8 @@ interface WarehousesPageProps {
 }
 
 export function WarehousesPage({ warehouses, setWarehouses }: WarehousesPageProps) {
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [formData, setFormData] = useState({
-    name: "",
-    location: "",
-    capacity: "",
-  })
-
-  const handleAddWarehouse = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (formData.name && formData.location && formData.capacity) {
-      if (editingId) {
-        setWarehouses(
-          warehouses.map((w) =>
-            w.id === editingId
-              ? {
-                  ...w,
-                  name: formData.name,
-                  location: formData.location,
-                  capacity: Number.parseInt(formData.capacity),
-                }
-              : w,
-          ),
-        )
-        setEditingId(null)
-      } else {
-        const newWarehouse: Warehouse = {
-          id: Date.now().toString(),
-          name: formData.name,
-          location: formData.location,
-          capacity: Number.parseInt(formData.capacity),
-          usedCapacity: 0,
-          locations: [],
-        }
-        setWarehouses([...warehouses, newWarehouse])
-      }
-      setFormData({ name: "", location: "", capacity: "" })
-      setShowForm(false)
-    }
-  }
-
   const handleDeleteWarehouse = (id: string) => {
     setWarehouses(warehouses.filter((w) => w.id !== id))
-  }
-
-  const handleEditWarehouse = (warehouse: Warehouse) => {
-    setFormData({
-      name: warehouse.name,
-      location: warehouse.location,
-      capacity: warehouse.capacity.toString(),
-    })
-    setEditingId(warehouse.id)
-    setShowForm(true)
   }
 
   const getCapacityPercentage = (warehouse: Warehouse) => {
@@ -82,75 +30,8 @@ export function WarehousesPage({ warehouses, setWarehouses }: WarehousesPageProp
           <h2 className="text-lg font-semibold text-foreground">Manage Warehouses</h2>
           <p className="text-sm text-muted-foreground">Total: {warehouses.length} warehouses</p>
         </div>
-        <Button
-          onClick={() => {
-            setShowForm(!showForm)
-            setEditingId(null)
-            setFormData({ name: "", location: "", capacity: "" })
-          }}
-          className="bg-accent hover:bg-accent/90 text-accent-foreground gap-2 whitespace-nowrap w-full sm:w-auto"
-        >
-          <Plus size={18} /> Add Warehouse
-        </Button>
+        <WarehouseDialog warehouses={warehouses} setWarehouses={setWarehouses} />
       </div>
-
-      {/* Add/Edit Warehouse Form */}
-      {showForm && (
-        <Card className="border-2 animate-scale-in">
-          <CardHeader>
-            <CardTitle className="text-lg">{editingId ? "Edit Warehouse" : "Add New Warehouse"}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleAddWarehouse} className="space-y-4 md:space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Warehouse Name *</Label>
-                  <Input
-                    id="name"
-                    placeholder="Enter warehouse name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="border-2"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="location">Location *</Label>
-                  <Input
-                    id="location"
-                    placeholder="Enter location"
-                    value={formData.location}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="border-2"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="capacity">Capacity (units) *</Label>
-                  <Input
-                    id="capacity"
-                    type="number"
-                    placeholder="Enter capacity"
-                    value={formData.capacity}
-                    onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
-                    className="border-2"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2 pt-4 flex-wrap">
-                <Button type="submit" className="bg-accent hover:bg-accent/90">
-                  {editingId ? "Update Warehouse" : "Add Warehouse"}
-                </Button>
-                <Button type="button" variant="outline" onClick={() => setShowForm(false)} className="border-2">
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Warehouses List */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {warehouses.map((warehouse) => {
@@ -166,12 +47,16 @@ export function WarehousesPage({ warehouses, setWarehouses }: WarehousesPageProp
                     <p className="text-sm text-muted-foreground mt-1">{warehouse.location}</p>
                   </div>
                   <div className="flex gap-1">
-                    <button
-                      onClick={() => handleEditWarehouse(warehouse)}
-                      className="p-1 hover:bg-primary/10 rounded transition-colors"
-                    >
-                      <Edit2 size={16} className="text-primary" />
-                    </button>
+                    <WarehouseDialog
+                      warehouse={warehouse}
+                      warehouses={warehouses}
+                      setWarehouses={setWarehouses}
+                      trigger={
+                        <button className="p-1 hover:bg-primary/10 rounded transition-colors">
+                          <Edit2 size={16} className="text-primary" />
+                        </button>
+                      }
+                    />
                     <button
                       onClick={() => handleDeleteWarehouse(warehouse.id)}
                       className="p-1 hover:bg-destructive/10 rounded transition-colors"

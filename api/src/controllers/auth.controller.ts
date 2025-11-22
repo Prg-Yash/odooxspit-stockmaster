@@ -45,22 +45,28 @@ const COOKIE_OPTIONS = {
 
 async function register(req: Request, res: Response) {
   try {
-    const { success, data } = AuthTypes.SRegister.safeParse(req.body);
+    const result = AuthTypes.SRegister.safeParse(req.body);
 
-    if (!success)
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid or missing data." });
+    if (!result.success) {
+      const errors = result.error.issues.map(e => e.message).join(", ");
+      return res.status(400).json({
+        success: false,
+        message: errors || "Validation failed."
+      });
+    }
+
+    const data = result.data;
 
     const existingUser = await prisma.user.findUnique({
       where: { email: data.email },
     });
 
-    if (existingUser)
-      return res.status(400).json({
+    if (existingUser) {
+      return res.status(409).json({
         success: false,
         message: "User with this email already exists.",
       });
+    }
 
     const hashedPassword = await hashPassword(data.password);
 
@@ -73,8 +79,8 @@ async function register(req: Request, res: Response) {
           data.role === "owner"
             ? UserRole.OWNER
             : data.role === "manager"
-            ? UserRole.MANAGER
-            : UserRole.STAFF,
+              ? UserRole.MANAGER
+              : UserRole.STAFF,
       },
     });
 
@@ -91,9 +97,12 @@ async function register(req: Request, res: Response) {
       message:
         "User registered successfully. Please check your email to verify your account.",
       data: {
-        userId: user.id,
-        email: user.email,
-        name: user.name,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        },
       },
     });
   } catch (error) {
@@ -203,7 +212,7 @@ async function login(req: Request, res: Response) {
     const accessToken = generateAccessToken(user.id, user.email);
 
     // Extract session metadata
-    const userAgent = (req.headers["x-forwarded-for"] as string) || "";
+    const userAgent = req.headers["user-agent"] || "";
     const ipAddress = getClientIp(req);
     const deviceInfo = parseUserAgent(userAgent);
     const deviceName = generateDeviceName(
@@ -235,6 +244,7 @@ async function login(req: Request, res: Response) {
           id: user.id,
           email: user.email,
           name: user.name,
+          role: user.role,
           emailVerified: user.emailVerified,
         },
       },
