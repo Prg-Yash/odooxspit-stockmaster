@@ -20,7 +20,7 @@ export class StockController {
       if (!warehouseId) {
         return res.status(400).json({ success: false, message: "Warehouse ID required" });
       }
-      const userId = req.user!.userId;
+      const userId = req.user.id;
       const validatedData = createStockMovementSchema.parse({
         ...req.body,
         type: StockMovementType.RECEIPT,
@@ -66,7 +66,7 @@ export class StockController {
       if (!warehouseId) {
         return res.status(400).json({ success: false, message: "Warehouse ID required" });
       }
-      const userId = req.user!.userId;
+      const userId = req.user.id;
       const validatedData = createStockMovementSchema.parse({
         ...req.body,
         type: StockMovementType.DELIVERY,
@@ -108,7 +108,7 @@ export class StockController {
    */
   async adjustStock(req: WarehouseAuthRequest, res: Response) {
     try {
-      const userId = req.user!.userId;
+      const userId = req.user.id;
       const validatedData = adjustStockSchema.parse(req.body);
 
       const result = await stockService.adjustStock(validatedData, userId);
@@ -132,7 +132,7 @@ export class StockController {
    */
   async transferStock(req: WarehouseAuthRequest, res: Response) {
     try {
-      const userId = req.user!.userId;
+      const userId = req.user.id;
       const validatedData = transferStockSchema.parse(req.body);
 
       const result = await stockService.transferStock(validatedData, userId);

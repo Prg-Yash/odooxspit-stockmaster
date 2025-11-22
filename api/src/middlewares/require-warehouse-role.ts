@@ -1,13 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 import { prisma } from "../lib/prisma";
-import { WarehouseMemberRole, UserRole } from "../generated/prisma/enums";
+import { WarehouseMemberRole } from "../generated/prisma/enums";
 
 export interface WarehouseAuthRequest extends Request {
-  user?: {
-    userId: string;
-    email: string;
-    role: UserRole;
-  };
   warehouseMember?: {
     warehouseId: string;
     userId: string;
@@ -28,7 +23,7 @@ export const requireWarehouseRole = (
     next: NextFunction
   ) => {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.id;
       const warehouseId = req.params.warehouseId || req.body.warehouseId;
 
       if (!userId) {
@@ -46,7 +41,7 @@ export const requireWarehouseRole = (
       }
 
       // Check if user is system OWNER (has access to all warehouses)
-      if (req.user?.role === UserRole.OWNER) {
+      if (req.user?.role === "OWNER") {
         // Attach a virtual warehouse member for consistency
         req.warehouseMember = {
           warehouseId,

@@ -40,22 +40,28 @@ const COOKIE_OPTIONS = {
 
 async function register(req: Request, res: Response) {
   try {
-    const { success, data } = AuthTypes.SRegister.safeParse(req.body);
+    const result = AuthTypes.SRegister.safeParse(req.body);
 
-    if (!success)
-      return res
-        .status(400)
-        .json({ success: false, message: "Email and password are required." });
+    if (!result.success) {
+      const errors = result.error.issues.map(e => e.message).join(", ");
+      return res.status(400).json({ 
+        success: false, 
+        message: errors || "Validation failed."
+      });
+    }
+
+    const data = result.data;
 
     const existingUser = await prisma.user.findUnique({
       where: { email: data.email },
     });
 
-    if (!existingUser)
+    if (existingUser) {
       return res.status(400).json({
         success: false,
         message: "User with this email already exists.",
       });
+    }
 
     const hashedPassword = await hashPassword(data.password);
 
@@ -63,6 +69,7 @@ async function register(req: Request, res: Response) {
       data: {
         email: data.email,
         password: hashedPassword,
+        name: data.name,
         role:
           data.role === "owner"
             ? UserRole.OWNER

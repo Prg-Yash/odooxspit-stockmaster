@@ -113,14 +113,310 @@ npm start
 
 All endpoints except auth routes require authentication via JWT token in `Authorization: Bearer <token>` header.
 
-#### Auth Routes
-- `POST /auth/register` - Register new user
-- `POST /auth/login` - Login and get tokens
-- `POST /auth/refresh` - Refresh access token
-- `POST /auth/logout` - Logout and revoke tokens
-- `POST /auth/verify-email` - Verify email address
-- `POST /auth/forgot-password` - Request password reset
-- `POST /auth/reset-password` - Reset password with token
+---
+
+### Auth Routes (`/auth`)
+
+#### Register New User
+```http
+POST /auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "SecurePass123!",
+  "name": "John Doe",
+  "role": "staff"  // "owner", "manager", or "staff"
+}
+```
+
+**Required Fields**:
+- `email` - Valid email address
+- `password` - Minimum 8 characters, must contain uppercase, lowercase, number, and special character (@$!%*?&_)
+- `name` - User's display name (minimum 1 character)
+- `role` - User role: "owner", "manager", or "staff"
+
+**Response (201)**:
+```json
+{
+  "success": true,
+  "message": "User registered successfully. Please check your email to verify your account.",
+  "data": {
+    "userId": "user_abc123",
+    "email": "user@example.com",
+    "name": "John Doe"
+  }
+}
+```
+
+#### Verify Email
+```http
+GET /auth/verify-email?token=verification_token&email=user@example.com
+```
+
+**Response (200)**:
+```json
+{
+  "success": true,
+  "message": "Email verified successfully. You can now log in."
+}
+```
+
+#### Resend Verification Email
+```http
+POST /auth/resend-verification-email
+Content-Type: application/json
+
+{
+  "email": "user@example.com"
+}
+```
+
+**Response (200)**:
+```json
+{
+  "success": true,
+  "message": "Verification email sent successfully. Please check your inbox."
+}
+```
+
+**Note**: Rate limited to 1 request per 2 minutes per email
+
+#### Login
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "securePassword123"
+}
+```
+
+**Response (200)**:
+```json
+{
+  "success": true,
+  "message": "Login successful.",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": "user_abc123",
+      "email": "user@example.com",
+      "name": "John Doe",
+      "emailVerified": true
+    }
+  }
+}
+```
+
+**Note**: 
+- Refresh token is also set in HTTP-only cookie
+- Email must be verified before login
+- Rate limited (20 requests per 15 minutes)
+
+#### Refresh Access Token
+```http
+POST /auth/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Or** (refresh token from cookie):
+```http
+POST /auth/refresh-token
+Cookie: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Response (200)**:
+```json
+{
+  "success": true,
+  "message": "Token refreshed successfully.",
+  "data": {
+    "accessToken": "new_access_token_here",
+    "refreshToken": "new_refresh_token_here"
+  }
+}
+```
+
+**Note**: 
+- Old refresh token is revoked (token rotation)
+- New refresh token is set in cookie
+
+#### Logout
+```http
+POST /auth/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "refresh_token_here"
+}
+```
+
+**Or** (refresh token from cookie):
+```http
+POST /auth/logout
+Cookie: refreshToken=refresh_token_here
+```
+
+**Response (200)**:
+```json
+{
+  "success": true,
+  "message": "Logout successful."
+}
+```
+
+**Note**: Revokes refresh token and clears cookie
+
+#### Request Password Reset
+```http
+POST /auth/request-password-reset
+Content-Type: application/json
+
+{
+  "email": "user@example.com"
+}
+```
+
+**Response (200)**:
+```json
+{
+  "success": true,
+  "message": "If an account with that email exists, a password reset link has been sent."
+}
+```
+
+**Note**: Always returns success to prevent user enumeration
+
+#### Reset Password
+```http
+POST /auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "reset_token_from_email",
+  "email": "user@example.com",
+  "newPassword": "newSecurePassword123"
+}
+```
+
+**Response (200)**:
+```json
+{
+  "success": true,
+  "message": "Password reset successfully. Please log in with your new password."
+}
+```
+
+**Note**: 
+- Revokes all refresh tokens (logs out all devices)
+- Password must be at least 8 characters
+
+---
+
+### User Routes (`/user`)
+
+**All user routes require authentication**
+
+#### Get Current User Profile
+```http
+GET /user/me
+Authorization: Bearer <access_token>
+```
+
+**Response (200)**:
+```json
+{
+  "success": true,
+  "data": {
+    "user": {
+      "id": "user_abc123",
+      "email": "user@example.com",
+      "name": "John Doe",
+      "emailVerified": true,
+      "role": "STAFF",
+      "createdAt": "2025-01-15T10:30:00.000Z",
+      "updatedAt": "2025-01-15T10:30:00.000Z"
+    }
+  }
+}
+```
+
+#### Update Profile
+```http
+PUT /user/update
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+  "name": "Jane Doe",
+  "email": "newemail@example.com",
+  "password": "newPassword123",
+  "currentPassword": "currentPassword123"
+}
+```
+
+**Fields**:
+- `name` (optional) - Update display name
+- `email` (optional) - Update email (requires re-verification)
+- `password` (optional) - New password (requires `currentPassword`)
+- `currentPassword` (required if changing password) - Current password for verification
+
+**Response (200)**:
+```json
+{
+  "success": true,
+  "message": "Profile updated successfully. A verification email has been sent to your new email address.",
+  "data": {
+    "user": {
+      "id": "user_abc123",
+      "email": "newemail@example.com",
+      "name": "Jane Doe",
+      "emailVerified": false,
+      "createdAt": "2025-01-15T10:30:00.000Z",
+      "updatedAt": "2025-01-20T14:22:00.000Z"
+    }
+  }
+}
+```
+
+**Notes**:
+- Changing email sets `emailVerified` to false
+- Changing password logs out all devices
+- Email format is validated
+- Password must be at least 8 characters
+
+#### Delete Account
+```http
+DELETE /user/delete
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+  "password": "currentPassword123"
+}
+```
+
+**Response (200)**:
+```json
+{
+  "success": true,
+  "message": "Account deleted successfully."
+}
+```
+
+**Note**: 
+- Requires password confirmation
+- Permanently deletes user and all associated data (cascade delete)
+- Clears refresh token cookie
+
+---
 
 ### Warehouses
 

@@ -30,6 +30,7 @@ async function requireAuth(req: Request, res: Response, next: NextFunction) {
         email: true,
         name: true,
         emailVerified: true,
+        role: true,
         createdAt: true,
         updatedAt: true,
       },

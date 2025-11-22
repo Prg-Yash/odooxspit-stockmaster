@@ -20,7 +20,7 @@ export namespace AuthTypes {
   }
 
   export const SRegister = z.object({
-    email: z.email(),
+    email: z.string().email("Invalid email format"),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters long")
@@ -32,7 +32,7 @@ export namespace AuthTypes {
         /[@$!%*?&_]/,
         "Password must contain at least one special character (@, $, !, %, *, ?, &, _)"
       ),
-    name: z.string(),
+    name: z.string().min(1, "Name is required"),
     role: z.enum(["owner", "manager", "staff"]),
   });
 

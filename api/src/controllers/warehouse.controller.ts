@@ -40,8 +40,8 @@ export class WarehouseController {
    */
   async getWarehouses(req: Request, res: Response) {
     try {
-      const userId = (req as any).user.userId;
-      const userRole = (req as any).user.role;
+      const userId = req.user.id;
+      const userRole = req.user.role;
 
       const warehouses = await warehouseService.getWarehousesByUser(
         userId,
