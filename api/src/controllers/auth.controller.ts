@@ -50,7 +50,7 @@ async function register(req: Request, res: Response) {
     if (!success)
       return res
         .status(400)
-        .json({ success: false, message: "Email and password are required." });
+        .json({ success: false, message: "Invalid or missing data." });
 
     const existingUser = await prisma.user.findUnique({
       where: { email: data.email },
@@ -68,6 +68,7 @@ async function register(req: Request, res: Response) {
       data: {
         email: data.email,
         password: hashedPassword,
+        name: data.name,
         role:
           data.role === "owner"
             ? UserRole.OWNER
@@ -210,8 +211,7 @@ async function login(req: Request, res: Response) {
     const accessToken = generateAccessToken(user.id, user.email);
 
     // Extract session metadata
-    const userAgent =
-      (req.headers["x-forwarded-for"] as string).split(",")[0]?.trim() || "";
+    const userAgent = (req.headers["x-forwarded-for"] as string) || "";
     const ipAddress = getClientIp(req);
     const deviceInfo = parseUserAgent(userAgent);
     const deviceName = generateDeviceName(
