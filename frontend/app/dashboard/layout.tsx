@@ -11,17 +11,6 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import { PageTransition } from "@/components/page-transition";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  SidebarProvider,
-  SidebarInset,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
-import { Separator } from "@/components/ui/separator";
-import { PageTransition } from "@/components/page-transition";
-import { Loader2 } from "lucide-react";
 
 export default function DashboardLayout({
   children,

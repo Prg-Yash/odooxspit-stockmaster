@@ -56,7 +56,19 @@ export const useAuthentication = () => {
           throw new Error(error.message);
         }
 
-        return await res.json();
+        const responseData = await res.json();
+
+        // Store token in localStorage as backup (in case cookies don't work)
+        if (responseData.data?.accessToken) {
+          localStorage.setItem('devAccessToken', responseData.data.accessToken);
+        }
+
+        // Store user data for UI
+        if (responseData.data?.user) {
+          localStorage.setItem('user', JSON.stringify(responseData.data.user));
+        }
+
+        return responseData;
       },
 
       onMutate: () =>

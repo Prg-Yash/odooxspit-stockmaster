@@ -268,6 +268,100 @@ async function sendPasswordResetOTPEmail(email: string, otp: string) {
   return await sendEmail(email, "Your Password Reset OTP", html);
 }
 
+/**
+ * Send warehouse member added notification email
+ */
+async function sendWarehouseMemberAddedEmail(
+  email: string,
+  userName: string | null,
+  warehouseName: string,
+  warehouseCode: string,
+  role: string,
+  addedByName: string | null
+) {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #2563eb; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .content { background-color: #f8fafc; padding: 30px; border-radius: 0 0 8px 8px; }
+        .warehouse-info { background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2563eb; }
+        .role-badge { background-color: #10b981; color: white; padding: 8px 16px; border-radius: 20px; display: inline-block; font-weight: bold; }
+        .info-item { margin: 12px 0; }
+        .info-label { font-weight: bold; color: #64748b; }
+        .footer { text-align: center; margin-top: 20px; padding: 20px; color: #64748b; font-size: 14px; }
+        .btn { display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+        ul { margin: 15px 0; padding-left: 20px; }
+        li { margin: 8px 0; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>🎉 Welcome to the Team!</h1>
+        </div>
+        <div class="content">
+          <p>Hi ${userName || "there"},</p>
+          
+          <p>Great news! You've been added to a warehouse in <strong>StockMaster</strong>.</p>
+
+          <div class="warehouse-info">
+            <div class="info-item">
+              <span class="info-label">Warehouse:</span> <strong>${warehouseName}</strong>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Warehouse Code:</span> <strong>${warehouseCode}</strong>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Your Role:</span> <span class="role-badge">${role}</span>
+            </div>
+            ${addedByName ? `<div class="info-item"><span class="info-label">Added by:</span> ${addedByName}</div>` : ''}
+          </div>
+
+          <h3>What You Can Do:</h3>
+          ${role === 'MANAGER' ? `
+          <ul>
+            <li>✅ Manage warehouse members</li>
+            <li>✅ Create and manage products</li>
+            <li>✅ Manage warehouse locations</li>
+            <li>✅ Perform all stock operations</li>
+            <li>✅ View reports and analytics</li>
+          </ul>
+          ` : `
+          <ul>
+            <li>✅ View warehouse details</li>
+            <li>✅ Perform stock operations (receive, deliver, transfer)</li>
+            <li>✅ View products and locations</li>
+            <li>✅ View stock levels and movements</li>
+          </ul>
+          `}
+
+          <p style="margin-top: 30px;">
+            <a href="${BASE_URL}/dashboard" class="btn" style="color: white;">Go to Dashboard</a>
+          </p>
+
+          <p style="margin-top: 20px; color: #64748b; font-size: 14px;">
+            Log in to your account to access the warehouse and start managing inventory!
+          </p>
+        </div>
+        <div class="footer">
+          <p>&copy; ${new Date().getFullYear()} StockMaster. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return await sendEmail(
+    email,
+    `You've been added to ${warehouseName} - StockMaster`,
+    html
+  );
+}
+
 export {
   initializeMailer,
   sendEmail,
@@ -275,4 +369,5 @@ export {
   sendPasswordResetEmail,
   sendWelcomeEmail,
   sendPasswordResetOTPEmail,
+  sendWarehouseMemberAddedEmail,
 };

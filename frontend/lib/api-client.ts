@@ -17,25 +17,28 @@ export class APIError extends Error {
 }
 
 /**
- * Get access token from cookies or localStorage (dev mode)
+ * Get access token from cookies or localStorage
+ * Priority: cookies first (for regular login), then localStorage (for dev login)
  */
 function getAccessToken(): string | null {
   if (typeof document === 'undefined') return null;
-  
-  // Try localStorage first (for development)
-  const devToken = localStorage.getItem('devAccessToken');
-  if (devToken) {
-    return devToken;
-  }
-  
-  // Fallback to cookies
+
+  // First, try to get from cookies (regular login flow)
   const cookies = document.cookie.split(';');
   const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('accessToken='));
-  
+
   if (tokenCookie) {
     return tokenCookie.split('=')[1];
   }
-  
+
+  // Fallback to localStorage (dev login or manual token storage)
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const devToken = window.localStorage.getItem('devAccessToken');
+    if (devToken) {
+      return devToken;
+    }
+  }
+
   return null;
 }
 
@@ -44,10 +47,10 @@ function getAccessToken(): string | null {
  */
 export async function apiRequest<T = any>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit & { body?: any } = {}
 ): Promise<T> {
   const token = getAccessToken();
-  
+
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
@@ -55,7 +58,7 @@ export async function apiRequest<T = any>(
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-  
+
   // Merge with any additional headers from options
   if (options.headers) {
     Object.assign(headers, options.headers);
@@ -63,12 +66,20 @@ export async function apiRequest<T = any>(
 
   const url = `${API_BASE_URL}${endpoint}`;
 
+  // Prepare the request body
+  const requestOptions: RequestInit = {
+    ...options,
+    headers,
+    credentials: 'include', // Include cookies
+  };
+
+  // Stringify body if it's an object and not already a string
+  if (options.body && typeof options.body === 'object') {
+    requestOptions.body = JSON.stringify(options.body);
+  }
+
   try {
-    const response = await fetch(url, {
-      ...options,
-      headers,
-      credentials: 'include', // Include cookies
-    });
+    const response = await fetch(url, requestOptions);
 
     const data = await response.json();
 
@@ -85,7 +96,7 @@ export async function apiRequest<T = any>(
     if (error instanceof APIError) {
       throw error;
     }
-    
+
     // Network or other errors
     throw new APIError(
       'Network error. Please check your connection.',
