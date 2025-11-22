@@ -39,9 +39,16 @@ function generateAccessToken(userId: string, email: string) {
 /**
  * Verify JWT access token
  */
-function verifyAccessToken(token: string) {
+function verifyAccessToken(token: string): AuthTypes.JwtPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    // jwt.verify can return a string for certain token types, we only want objects
+    if (typeof decoded === "string") {
+      return null;
+    }
+
+    return decoded as AuthTypes.JwtPayload;
   } catch (error) {
     return null;
   }

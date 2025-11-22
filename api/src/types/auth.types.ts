@@ -2,6 +2,7 @@ import z from "zod";
 
 export namespace AuthTypes {
   export type AuthRoles = "owner" | "manager" | "staff";
+
   export type SessionMetadata = {
     ipAddress: string | null;
     userAgent: string | null;
@@ -10,6 +11,13 @@ export namespace AuthTypes {
     browser: string | null;
     os: string | null;
   };
+
+  export interface JwtPayload {
+    userId: string;
+    email: string;
+    iat?: number;
+    exp?: number;
+  }
 
   export const SRegister = z.object({
     email: z.email(),
