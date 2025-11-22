@@ -12,5 +12,8 @@ export async function makeApiRequest({
   if (!endpoint.startsWith("/"))
     throw new Error("Endpoints must start with leading slash");
 
-  return await fetch(`${apiURL}${endpoint}`, opts);
+  return await fetch(`${apiURL}${endpoint}`, {
+    credentials: "include",
+    ...opts,
+  });
 }
