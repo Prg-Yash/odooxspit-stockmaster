@@ -79,6 +79,8 @@ async function register(req: Request, res: Response) {
       data.email
     );
 
+    await sendVerificationEmail(data.email, verificationToken);
+
     res.status(201).json({
       success: true,
       message:

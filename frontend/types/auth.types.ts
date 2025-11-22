@@ -1,25 +1,6 @@
 import z from "zod";
-
 export namespace AuthTypes {
-  export type AuthRoles = "owner" | "manager" | "staff";
-
-  export type SessionMetadata = {
-    ipAddress: string | null;
-    userAgent: string | null;
-    deviceName: string | null;
-    deviceType: string | null;
-    browser: string | null;
-    os: string | null;
-  };
-
-  export interface JwtPayload {
-    userId: string;
-    email: string;
-    iat?: number;
-    exp?: number;
-  }
-
-  export const SRegister = z.object({
+  export const SRegisterUser = z.object({
     email: z.email(),
     password: z
       .string()
@@ -36,5 +17,5 @@ export namespace AuthTypes {
     role: z.enum(["owner", "manager", "staff"]).default("owner").optional(),
   });
 
-  export type TRegister = z.infer<typeof SRegister>;
+  export type TRegisterUser = z.infer<typeof SRegisterUser>;
 }
