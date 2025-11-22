@@ -5,7 +5,7 @@ import { requireAuth } from "../middlewares/require-auth";
 const router = Router();
 
 // All vendor routes require authentication
-router.use(requireAuth);
+// router.use(requireAuth);
 
 // Create vendor (OWNER/MANAGER only)
 router.post("/", vendorController.createVendor);
