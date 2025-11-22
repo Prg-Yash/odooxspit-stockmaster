@@ -91,19 +91,19 @@ export async function apiRequest<T = any>(
           localStorage.removeItem('user');
           localStorage.removeItem('devAccessToken');
         }
-        
+
         // Clear cookies
         if (typeof document !== 'undefined') {
           document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
           document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         }
-        
+
         // Redirect to login
         if (typeof window !== 'undefined') {
           window.location.href = '/login';
         }
       }
-      
+
       throw new APIError(
         data.message || 'An error occurred',
         response.status,

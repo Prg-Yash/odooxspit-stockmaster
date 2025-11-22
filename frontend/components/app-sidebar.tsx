@@ -132,11 +132,11 @@ const useAuthHook = () => {
     // Clear localStorage
     localStorage.removeItem("user")
     localStorage.removeItem("devAccessToken")
-    
+
     // Clear cookies by setting them to expire
     document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
     document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
-    
+
     // Redirect to login
     router.push("/login")
   }
@@ -155,7 +155,9 @@ const MenuSection = ({ section, isActive, isExactMatch, shouldExpand, userRole }
   const filteredItems = section.items.filter(item => {
     if (!item.roles) return true // No role restriction
     if (!userRole) return false // No user role, hide restricted items
-    return item.roles.includes(userRole)
+    // Normalize role to lowercase for comparison (backend sends OWNER/MANAGER/STAFF)
+    const normalizedRole = userRole.toLowerCase() as "owner" | "manager" | "employee"
+    return item.roles.includes(normalizedRole)
   })
 
   // Don't render section if all items are filtered out
@@ -196,9 +198,9 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild tooltip="StockMaster" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
               <Link href="/dashboard">
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <Package className="w-6 h-6" />
-              </div>
+                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                  <Package className="w-6 h-6" />
+                </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">StockMaster</span>
                   <span className="truncate text-xs">Inventory System</span>
@@ -217,7 +219,7 @@ export function AppSidebar() {
             isActive={isActiveRoute}
             isExactMatch={isExactMatch}
             shouldExpand={shouldExpandCollapsible}
-            userRole={user?.role}
+            userRole={user?.role?.toLowerCase()}
           />
         ))}
       </SidebarContent>
@@ -227,27 +229,27 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton
-                    size="lg"
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                    tooltip={{
-                      children: user?.name || user?.email || "User",
-                      hidden: false,
-                    }}
-                  >
-                    <div className="flex items-center justify-center">
-                      <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarFallback className="rounded-lg">
-                          {user?.name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                    </div>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">{user?.name || user?.email || "User"}</span>
-                      <span className="truncate text-xs capitalize">{user?.role || "employee"}</span>
-                    </div>
-                    <ChevronDown className="ml-auto size-4" />
-                  </SidebarMenuButton>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                  tooltip={{
+                    children: user?.name || user?.email || "User",
+                    hidden: false,
+                  }}
+                >
+                  <div className="flex items-center justify-center">
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarFallback className="rounded-lg">
+                        {user?.name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">{user?.name || user?.email || "User"}</span>
+                    <span className="truncate text-xs capitalize">{user?.role?.toLowerCase() || "staff"}</span>
+                  </div>
+                  <ChevronDown className="ml-auto size-4" />
+                </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"

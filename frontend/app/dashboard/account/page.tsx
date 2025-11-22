@@ -8,8 +8,8 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { User, Mail, Building2, MapPin, Phone, Calendar, Upload, Edit2, Save, X, Lock } from "lucide-react"
-import { updateProfile } from "@/lib/api/user"
+import { User, Mail, Building2, MapPin, Phone, Calendar, Upload, Edit2, Save, X, Lock, Loader2 } from "lucide-react"
+import { updateProfile, getCurrentUser } from "@/lib/api/user"
 import { toast } from "sonner"
 
 export default function AccountPage() {
@@ -23,14 +23,39 @@ export default function AccountPage() {
     confirmPassword: ""
   })
   const [isLoading, setIsLoading] = useState(false)
+  const [isFetchingUser, setIsFetchingUser] = useState(true)
 
   useEffect(() => {
-    const userData = localStorage.getItem("user")
-    if (userData) {
-      const parsedUser = JSON.parse(userData)
-      setUser(parsedUser)
-      setEditedName(parsedUser.name || "")
+    // Fetch fresh user data from API
+    const fetchUserData = async () => {
+      try {
+        setIsFetchingUser(true)
+        const response = await getCurrentUser()
+
+        if (response.success && response.data?.user) {
+          const userData = response.data.user
+          setUser(userData)
+          setEditedName(userData.name || "")
+          // Update localStorage with fresh data
+          localStorage.setItem("user", JSON.stringify(userData))
+        }
+      } catch (error: any) {
+        console.error("Error fetching user data:", error)
+        // Fallback to localStorage if API fails (but not on 401 as it will redirect)
+        if (error.status !== 401) {
+          const storedUser = localStorage.getItem("user")
+          if (storedUser) {
+            const parsedUser = JSON.parse(storedUser)
+            setUser(parsedUser)
+            setEditedName(parsedUser.name || "")
+          }
+        }
+      } finally {
+        setIsFetchingUser(false)
+      }
     }
+
+    fetchUserData()
   }, [])
 
   const handleSaveName = async () => {
@@ -42,9 +67,12 @@ export default function AccountPage() {
     setIsLoading(true)
     try {
       const response = await updateProfile({ name: editedName })
-      
+
       if (response.success && response.data?.user) {
-        const updatedUser = response.data.user
+        const updatedUser = {
+          ...response.data.user,
+          role: response.data.user.role // Ensure role is preserved as-is from API
+        }
         setUser(updatedUser)
         localStorage.setItem("user", JSON.stringify(updatedUser))
         setIsEditingName(false)
@@ -93,12 +121,12 @@ export default function AccountPage() {
         password: passwordData.newPassword,
         currentPassword: passwordData.currentPassword
       })
-      
+
       if (response.success) {
         toast.success("Password updated successfully. Please log in again.")
         setIsEditingPassword(false)
         setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" })
-        
+
         // Clear auth data and redirect to login after a delay
         setTimeout(() => {
           localStorage.removeItem("user")
@@ -122,6 +150,17 @@ export default function AccountPage() {
   const handleCancelPasswordEdit = () => {
     setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" })
     setIsEditingPassword(false)
+  }
+
+  if (isFetchingUser) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-sm text-muted-foreground">Loading account information...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!user) {
@@ -150,7 +189,7 @@ export default function AccountPage() {
                 <h3 className="font-semibold text-lg">{user.name || "User"}</h3>
                 <p className="text-sm text-muted-foreground">{user.email}</p>
                 <Badge variant="secondary" className="capitalize">
-                  {user.role || "staff"}
+                  {user.role?.toLowerCase() || "staff"}
                 </Badge>
               </div>
             </div>
@@ -377,7 +416,7 @@ export default function AccountPage() {
                 <div className="space-y-0.5">
                   <p className="text-sm font-medium">Role</p>
                   <p className="text-xs text-muted-foreground capitalize">
-                    {user.role || "staff"}
+                    {user.role?.toLowerCase() || "staff"}
                   </p>
                 </div>
               </div>
