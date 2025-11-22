@@ -212,6 +212,11 @@ export type UserWhereInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPListRelationFilter
   warehouseMemberships?: Prisma.WarehouseMemberListRelationFilter
   stockMovements?: Prisma.StockMovementListRelationFilter
+  receiptsCreated?: Prisma.ReceiptListRelationFilter
+  receiptsUpdated?: Prisma.ReceiptListRelationFilter
+  deliveriesCreated?: Prisma.DeliveryListRelationFilter
+  deliveriesUpdated?: Prisma.DeliveryListRelationFilter
+  deliveriesReceived?: Prisma.DeliveryListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -229,6 +234,11 @@ export type UserOrderByWithRelationInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPOrderByRelationAggregateInput
   warehouseMemberships?: Prisma.WarehouseMemberOrderByRelationAggregateInput
   stockMovements?: Prisma.StockMovementOrderByRelationAggregateInput
+  receiptsCreated?: Prisma.ReceiptOrderByRelationAggregateInput
+  receiptsUpdated?: Prisma.ReceiptOrderByRelationAggregateInput
+  deliveriesCreated?: Prisma.DeliveryOrderByRelationAggregateInput
+  deliveriesUpdated?: Prisma.DeliveryOrderByRelationAggregateInput
+  deliveriesReceived?: Prisma.DeliveryOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -249,6 +259,11 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   passwordResetOTPs?: Prisma.PasswordResetOTPListRelationFilter
   warehouseMemberships?: Prisma.WarehouseMemberListRelationFilter
   stockMovements?: Prisma.StockMovementListRelationFilter
+  receiptsCreated?: Prisma.ReceiptListRelationFilter
+  receiptsUpdated?: Prisma.ReceiptListRelationFilter
+  deliveriesCreated?: Prisma.DeliveryListRelationFilter
+  deliveriesUpdated?: Prisma.DeliveryListRelationFilter
+  deliveriesReceived?: Prisma.DeliveryListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -294,6 +309,11 @@ export type UserCreateInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPCreateNestedManyWithoutUserInput
   warehouseMemberships?: Prisma.WarehouseMemberCreateNestedManyWithoutUserInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -311,6 +331,11 @@ export type UserUncheckedCreateInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedCreateNestedManyWithoutUserInput
   warehouseMemberships?: Prisma.WarehouseMemberUncheckedCreateNestedManyWithoutUserInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -328,6 +353,11 @@ export type UserUpdateInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPUpdateManyWithoutUserNestedInput
   warehouseMemberships?: Prisma.WarehouseMemberUpdateManyWithoutUserNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -345,6 +375,11 @@ export type UserUncheckedUpdateInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedUpdateManyWithoutUserNestedInput
   warehouseMemberships?: Prisma.WarehouseMemberUncheckedUpdateManyWithoutUserNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUncheckedUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -416,6 +451,11 @@ export type UserMinOrderByAggregateInput = {
 export type UserScalarRelationFilter = {
   is?: Prisma.UserWhereInput
   isNot?: Prisma.UserWhereInput
+}
+
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -522,6 +562,82 @@ export type UserUpdateOneRequiredWithoutStockMovementsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStockMovementsInput, Prisma.UserUpdateWithoutStockMovementsInput>, Prisma.UserUncheckedUpdateWithoutStockMovementsInput>
 }
 
+export type UserCreateNestedOneWithoutReceiptsCreatedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReceiptsCreatedInput, Prisma.UserUncheckedCreateWithoutReceiptsCreatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReceiptsCreatedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutReceiptsUpdatedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReceiptsUpdatedInput, Prisma.UserUncheckedCreateWithoutReceiptsUpdatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReceiptsUpdatedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutReceiptsCreatedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReceiptsCreatedInput, Prisma.UserUncheckedCreateWithoutReceiptsCreatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReceiptsCreatedInput
+  upsert?: Prisma.UserUpsertWithoutReceiptsCreatedInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReceiptsCreatedInput, Prisma.UserUpdateWithoutReceiptsCreatedInput>, Prisma.UserUncheckedUpdateWithoutReceiptsCreatedInput>
+}
+
+export type UserUpdateOneWithoutReceiptsUpdatedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReceiptsUpdatedInput, Prisma.UserUncheckedCreateWithoutReceiptsUpdatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReceiptsUpdatedInput
+  upsert?: Prisma.UserUpsertWithoutReceiptsUpdatedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReceiptsUpdatedInput, Prisma.UserUpdateWithoutReceiptsUpdatedInput>, Prisma.UserUncheckedUpdateWithoutReceiptsUpdatedInput>
+}
+
+export type UserCreateNestedOneWithoutDeliveriesReceivedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesReceivedInput, Prisma.UserUncheckedCreateWithoutDeliveriesReceivedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeliveriesReceivedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutDeliveriesCreatedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesCreatedInput, Prisma.UserUncheckedCreateWithoutDeliveriesCreatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeliveriesCreatedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutDeliveriesUpdatedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesUpdatedInput, Prisma.UserUncheckedCreateWithoutDeliveriesUpdatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeliveriesUpdatedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutDeliveriesReceivedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesReceivedInput, Prisma.UserUncheckedCreateWithoutDeliveriesReceivedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeliveriesReceivedInput
+  upsert?: Prisma.UserUpsertWithoutDeliveriesReceivedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDeliveriesReceivedInput, Prisma.UserUpdateWithoutDeliveriesReceivedInput>, Prisma.UserUncheckedUpdateWithoutDeliveriesReceivedInput>
+}
+
+export type UserUpdateOneRequiredWithoutDeliveriesCreatedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesCreatedInput, Prisma.UserUncheckedCreateWithoutDeliveriesCreatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeliveriesCreatedInput
+  upsert?: Prisma.UserUpsertWithoutDeliveriesCreatedInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDeliveriesCreatedInput, Prisma.UserUpdateWithoutDeliveriesCreatedInput>, Prisma.UserUncheckedUpdateWithoutDeliveriesCreatedInput>
+}
+
+export type UserUpdateOneWithoutDeliveriesUpdatedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesUpdatedInput, Prisma.UserUncheckedCreateWithoutDeliveriesUpdatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeliveriesUpdatedInput
+  upsert?: Prisma.UserUpsertWithoutDeliveriesUpdatedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDeliveriesUpdatedInput, Prisma.UserUpdateWithoutDeliveriesUpdatedInput>, Prisma.UserUncheckedUpdateWithoutDeliveriesUpdatedInput>
+}
+
 export type UserCreateWithoutRefreshTokensInput = {
   id?: string
   email: string
@@ -536,6 +652,11 @@ export type UserCreateWithoutRefreshTokensInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPCreateNestedManyWithoutUserInput
   warehouseMemberships?: Prisma.WarehouseMemberCreateNestedManyWithoutUserInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRefreshTokensInput = {
@@ -552,6 +673,11 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedCreateNestedManyWithoutUserInput
   warehouseMemberships?: Prisma.WarehouseMemberUncheckedCreateNestedManyWithoutUserInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRefreshTokensInput = {
@@ -584,6 +710,11 @@ export type UserUpdateWithoutRefreshTokensInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPUpdateManyWithoutUserNestedInput
   warehouseMemberships?: Prisma.WarehouseMemberUpdateManyWithoutUserNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRefreshTokensInput = {
@@ -600,6 +731,11 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedUpdateManyWithoutUserNestedInput
   warehouseMemberships?: Prisma.WarehouseMemberUncheckedUpdateManyWithoutUserNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUncheckedUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEmailVerificationTokensInput = {
@@ -616,6 +752,11 @@ export type UserCreateWithoutEmailVerificationTokensInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPCreateNestedManyWithoutUserInput
   warehouseMemberships?: Prisma.WarehouseMemberCreateNestedManyWithoutUserInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
@@ -632,6 +773,11 @@ export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedCreateNestedManyWithoutUserInput
   warehouseMemberships?: Prisma.WarehouseMemberUncheckedCreateNestedManyWithoutUserInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEmailVerificationTokensInput = {
@@ -664,6 +810,11 @@ export type UserUpdateWithoutEmailVerificationTokensInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPUpdateManyWithoutUserNestedInput
   warehouseMemberships?: Prisma.WarehouseMemberUpdateManyWithoutUserNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
@@ -680,6 +831,11 @@ export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedUpdateManyWithoutUserNestedInput
   warehouseMemberships?: Prisma.WarehouseMemberUncheckedUpdateManyWithoutUserNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUncheckedUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPasswordResetTokensInput = {
@@ -696,6 +852,11 @@ export type UserCreateWithoutPasswordResetTokensInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPCreateNestedManyWithoutUserInput
   warehouseMemberships?: Prisma.WarehouseMemberCreateNestedManyWithoutUserInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
@@ -712,6 +873,11 @@ export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedCreateNestedManyWithoutUserInput
   warehouseMemberships?: Prisma.WarehouseMemberUncheckedCreateNestedManyWithoutUserInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
@@ -744,6 +910,11 @@ export type UserUpdateWithoutPasswordResetTokensInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPUpdateManyWithoutUserNestedInput
   warehouseMemberships?: Prisma.WarehouseMemberUpdateManyWithoutUserNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
@@ -760,6 +931,11 @@ export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
   passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedUpdateManyWithoutUserNestedInput
   warehouseMemberships?: Prisma.WarehouseMemberUncheckedUpdateManyWithoutUserNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUncheckedUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPasswordResetOTPsInput = {
@@ -776,6 +952,11 @@ export type UserCreateWithoutPasswordResetOTPsInput = {
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   warehouseMemberships?: Prisma.WarehouseMemberCreateNestedManyWithoutUserInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPasswordResetOTPsInput = {
@@ -792,6 +973,11 @@ export type UserUncheckedCreateWithoutPasswordResetOTPsInput = {
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   warehouseMemberships?: Prisma.WarehouseMemberUncheckedCreateNestedManyWithoutUserInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPasswordResetOTPsInput = {
@@ -824,6 +1010,11 @@ export type UserUpdateWithoutPasswordResetOTPsInput = {
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   warehouseMemberships?: Prisma.WarehouseMemberUpdateManyWithoutUserNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPasswordResetOTPsInput = {
@@ -840,6 +1031,11 @@ export type UserUncheckedUpdateWithoutPasswordResetOTPsInput = {
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   warehouseMemberships?: Prisma.WarehouseMemberUncheckedUpdateManyWithoutUserNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUncheckedUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutWarehouseMembershipsInput = {
@@ -856,6 +1052,11 @@ export type UserCreateWithoutWarehouseMembershipsInput = {
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   passwordResetOTPs?: Prisma.PasswordResetOTPCreateNestedManyWithoutUserInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutWarehouseMembershipsInput = {
@@ -872,6 +1073,11 @@ export type UserUncheckedCreateWithoutWarehouseMembershipsInput = {
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedCreateNestedManyWithoutUserInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutWarehouseMembershipsInput = {
@@ -904,6 +1110,11 @@ export type UserUpdateWithoutWarehouseMembershipsInput = {
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   passwordResetOTPs?: Prisma.PasswordResetOTPUpdateManyWithoutUserNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWarehouseMembershipsInput = {
@@ -920,6 +1131,11 @@ export type UserUncheckedUpdateWithoutWarehouseMembershipsInput = {
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedUpdateManyWithoutUserNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUncheckedUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutStockMovementsInput = {
@@ -936,6 +1152,11 @@ export type UserCreateWithoutStockMovementsInput = {
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   passwordResetOTPs?: Prisma.PasswordResetOTPCreateNestedManyWithoutUserInput
   warehouseMemberships?: Prisma.WarehouseMemberCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutStockMovementsInput = {
@@ -952,6 +1173,11 @@ export type UserUncheckedCreateWithoutStockMovementsInput = {
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedCreateNestedManyWithoutUserInput
   warehouseMemberships?: Prisma.WarehouseMemberUncheckedCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutStockMovementsInput = {
@@ -984,6 +1210,11 @@ export type UserUpdateWithoutStockMovementsInput = {
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   passwordResetOTPs?: Prisma.PasswordResetOTPUpdateManyWithoutUserNestedInput
   warehouseMemberships?: Prisma.WarehouseMemberUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStockMovementsInput = {
@@ -1000,6 +1231,511 @@ export type UserUncheckedUpdateWithoutStockMovementsInput = {
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedUpdateManyWithoutUserNestedInput
   warehouseMemberships?: Prisma.WarehouseMemberUncheckedUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUncheckedUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutReceiptsCreatedInput = {
+  id?: string
+  email: string
+  password: string
+  name?: string | null
+  emailVerified?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role: $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPCreateNestedManyWithoutUserInput
+  warehouseMemberships?: Prisma.WarehouseMemberCreateNestedManyWithoutUserInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutUserInput
+  receiptsUpdated?: Prisma.ReceiptCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutReceiptsCreatedInput = {
+  id?: string
+  email: string
+  password: string
+  name?: string | null
+  emailVerified?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role: $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedCreateNestedManyWithoutUserInput
+  warehouseMemberships?: Prisma.WarehouseMemberUncheckedCreateNestedManyWithoutUserInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutUserInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutReceiptsCreatedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReceiptsCreatedInput, Prisma.UserUncheckedCreateWithoutReceiptsCreatedInput>
+}
+
+export type UserCreateWithoutReceiptsUpdatedInput = {
+  id?: string
+  email: string
+  password: string
+  name?: string | null
+  emailVerified?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role: $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPCreateNestedManyWithoutUserInput
+  warehouseMemberships?: Prisma.WarehouseMemberCreateNestedManyWithoutUserInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptCreateNestedManyWithoutCreatedByInput
+  deliveriesCreated?: Prisma.DeliveryCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutReceiptsUpdatedInput = {
+  id?: string
+  email: string
+  password: string
+  name?: string | null
+  emailVerified?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role: $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedCreateNestedManyWithoutUserInput
+  warehouseMemberships?: Prisma.WarehouseMemberUncheckedCreateNestedManyWithoutUserInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutCreatedByInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutReceiptsUpdatedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReceiptsUpdatedInput, Prisma.UserUncheckedCreateWithoutReceiptsUpdatedInput>
+}
+
+export type UserUpsertWithoutReceiptsCreatedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReceiptsCreatedInput, Prisma.UserUncheckedUpdateWithoutReceiptsCreatedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReceiptsCreatedInput, Prisma.UserUncheckedCreateWithoutReceiptsCreatedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReceiptsCreatedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReceiptsCreatedInput, Prisma.UserUncheckedUpdateWithoutReceiptsCreatedInput>
+}
+
+export type UserUpdateWithoutReceiptsCreatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPUpdateManyWithoutUserNestedInput
+  warehouseMemberships?: Prisma.WarehouseMemberUpdateManyWithoutUserNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutUserNestedInput
+  receiptsUpdated?: Prisma.ReceiptUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReceiptsCreatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedUpdateManyWithoutUserNestedInput
+  warehouseMemberships?: Prisma.WarehouseMemberUncheckedUpdateManyWithoutUserNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutUserNestedInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutReceiptsUpdatedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReceiptsUpdatedInput, Prisma.UserUncheckedUpdateWithoutReceiptsUpdatedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReceiptsUpdatedInput, Prisma.UserUncheckedCreateWithoutReceiptsUpdatedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReceiptsUpdatedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReceiptsUpdatedInput, Prisma.UserUncheckedUpdateWithoutReceiptsUpdatedInput>
+}
+
+export type UserUpdateWithoutReceiptsUpdatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPUpdateManyWithoutUserNestedInput
+  warehouseMemberships?: Prisma.WarehouseMemberUpdateManyWithoutUserNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUpdateManyWithoutCreatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReceiptsUpdatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedUpdateManyWithoutUserNestedInput
+  warehouseMemberships?: Prisma.WarehouseMemberUncheckedUpdateManyWithoutUserNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUncheckedUpdateManyWithoutCreatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutDeliveriesReceivedInput = {
+  id?: string
+  email: string
+  password: string
+  name?: string | null
+  emailVerified?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role: $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPCreateNestedManyWithoutUserInput
+  warehouseMemberships?: Prisma.WarehouseMemberCreateNestedManyWithoutUserInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryCreateNestedManyWithoutUpdatedByInput
+}
+
+export type UserUncheckedCreateWithoutDeliveriesReceivedInput = {
+  id?: string
+  email: string
+  password: string
+  name?: string | null
+  emailVerified?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role: $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedCreateNestedManyWithoutUserInput
+  warehouseMemberships?: Prisma.WarehouseMemberUncheckedCreateNestedManyWithoutUserInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutCreatedByInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUpdatedByInput
+}
+
+export type UserCreateOrConnectWithoutDeliveriesReceivedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesReceivedInput, Prisma.UserUncheckedCreateWithoutDeliveriesReceivedInput>
+}
+
+export type UserCreateWithoutDeliveriesCreatedInput = {
+  id?: string
+  email: string
+  password: string
+  name?: string | null
+  emailVerified?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role: $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPCreateNestedManyWithoutUserInput
+  warehouseMemberships?: Prisma.WarehouseMemberCreateNestedManyWithoutUserInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptCreateNestedManyWithoutUpdatedByInput
+  deliveriesUpdated?: Prisma.DeliveryCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutDeliveriesCreatedInput = {
+  id?: string
+  email: string
+  password: string
+  name?: string | null
+  emailVerified?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role: $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedCreateNestedManyWithoutUserInput
+  warehouseMemberships?: Prisma.WarehouseMemberUncheckedCreateNestedManyWithoutUserInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutDeliveriesCreatedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesCreatedInput, Prisma.UserUncheckedCreateWithoutDeliveriesCreatedInput>
+}
+
+export type UserCreateWithoutDeliveriesUpdatedInput = {
+  id?: string
+  email: string
+  password: string
+  name?: string | null
+  emailVerified?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role: $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPCreateNestedManyWithoutUserInput
+  warehouseMemberships?: Prisma.WarehouseMemberCreateNestedManyWithoutUserInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryCreateNestedManyWithoutCreatedByInput
+  deliveriesReceived?: Prisma.DeliveryCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutDeliveriesUpdatedInput = {
+  id?: string
+  email: string
+  password: string
+  name?: string | null
+  emailVerified?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role: $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedCreateNestedManyWithoutUserInput
+  warehouseMemberships?: Prisma.WarehouseMemberUncheckedCreateNestedManyWithoutUserInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutUserInput
+  receiptsCreated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutCreatedByInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedCreateNestedManyWithoutUpdatedByInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedCreateNestedManyWithoutCreatedByInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutDeliveriesUpdatedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesUpdatedInput, Prisma.UserUncheckedCreateWithoutDeliveriesUpdatedInput>
+}
+
+export type UserUpsertWithoutDeliveriesReceivedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDeliveriesReceivedInput, Prisma.UserUncheckedUpdateWithoutDeliveriesReceivedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesReceivedInput, Prisma.UserUncheckedCreateWithoutDeliveriesReceivedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDeliveriesReceivedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDeliveriesReceivedInput, Prisma.UserUncheckedUpdateWithoutDeliveriesReceivedInput>
+}
+
+export type UserUpdateWithoutDeliveriesReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPUpdateManyWithoutUserNestedInput
+  warehouseMemberships?: Prisma.WarehouseMemberUpdateManyWithoutUserNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUpdateManyWithoutUpdatedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDeliveriesReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedUpdateManyWithoutUserNestedInput
+  warehouseMemberships?: Prisma.WarehouseMemberUncheckedUpdateManyWithoutUserNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUncheckedUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedUpdateManyWithoutCreatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedUpdateManyWithoutUpdatedByNestedInput
+}
+
+export type UserUpsertWithoutDeliveriesCreatedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDeliveriesCreatedInput, Prisma.UserUncheckedUpdateWithoutDeliveriesCreatedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesCreatedInput, Prisma.UserUncheckedCreateWithoutDeliveriesCreatedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDeliveriesCreatedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDeliveriesCreatedInput, Prisma.UserUncheckedUpdateWithoutDeliveriesCreatedInput>
+}
+
+export type UserUpdateWithoutDeliveriesCreatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPUpdateManyWithoutUserNestedInput
+  warehouseMemberships?: Prisma.WarehouseMemberUpdateManyWithoutUserNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUpdateManyWithoutUpdatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDeliveriesCreatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedUpdateManyWithoutUserNestedInput
+  warehouseMemberships?: Prisma.WarehouseMemberUncheckedUpdateManyWithoutUserNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUncheckedUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesUpdated?: Prisma.DeliveryUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutDeliveriesUpdatedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDeliveriesUpdatedInput, Prisma.UserUncheckedUpdateWithoutDeliveriesUpdatedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesUpdatedInput, Prisma.UserUncheckedCreateWithoutDeliveriesUpdatedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDeliveriesUpdatedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDeliveriesUpdatedInput, Prisma.UserUncheckedUpdateWithoutDeliveriesUpdatedInput>
+}
+
+export type UserUpdateWithoutDeliveriesUpdatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPUpdateManyWithoutUserNestedInput
+  warehouseMemberships?: Prisma.WarehouseMemberUpdateManyWithoutUserNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUpdateManyWithoutCreatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDeliveriesUpdatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOTPs?: Prisma.PasswordResetOTPUncheckedUpdateManyWithoutUserNestedInput
+  warehouseMemberships?: Prisma.WarehouseMemberUncheckedUpdateManyWithoutUserNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutUserNestedInput
+  receiptsCreated?: Prisma.ReceiptUncheckedUpdateManyWithoutCreatedByNestedInput
+  receiptsUpdated?: Prisma.ReceiptUncheckedUpdateManyWithoutUpdatedByNestedInput
+  deliveriesCreated?: Prisma.DeliveryUncheckedUpdateManyWithoutCreatedByNestedInput
+  deliveriesReceived?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -1014,6 +1750,11 @@ export type UserCountOutputType = {
   passwordResetOTPs: number
   warehouseMemberships: number
   stockMovements: number
+  receiptsCreated: number
+  receiptsUpdated: number
+  deliveriesCreated: number
+  deliveriesUpdated: number
+  deliveriesReceived: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1023,6 +1764,11 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   passwordResetOTPs?: boolean | UserCountOutputTypeCountPasswordResetOTPsArgs
   warehouseMemberships?: boolean | UserCountOutputTypeCountWarehouseMembershipsArgs
   stockMovements?: boolean | UserCountOutputTypeCountStockMovementsArgs
+  receiptsCreated?: boolean | UserCountOutputTypeCountReceiptsCreatedArgs
+  receiptsUpdated?: boolean | UserCountOutputTypeCountReceiptsUpdatedArgs
+  deliveriesCreated?: boolean | UserCountOutputTypeCountDeliveriesCreatedArgs
+  deliveriesUpdated?: boolean | UserCountOutputTypeCountDeliveriesUpdatedArgs
+  deliveriesReceived?: boolean | UserCountOutputTypeCountDeliveriesReceivedArgs
 }
 
 /**
@@ -1077,6 +1823,41 @@ export type UserCountOutputTypeCountStockMovementsArgs<ExtArgs extends runtime.T
   where?: Prisma.StockMovementWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReceiptsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReceiptWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReceiptsUpdatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReceiptWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDeliveriesCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeliveryWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDeliveriesUpdatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeliveryWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDeliveriesReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeliveryWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1093,6 +1874,11 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   passwordResetOTPs?: boolean | Prisma.User$passwordResetOTPsArgs<ExtArgs>
   warehouseMemberships?: boolean | Prisma.User$warehouseMembershipsArgs<ExtArgs>
   stockMovements?: boolean | Prisma.User$stockMovementsArgs<ExtArgs>
+  receiptsCreated?: boolean | Prisma.User$receiptsCreatedArgs<ExtArgs>
+  receiptsUpdated?: boolean | Prisma.User$receiptsUpdatedArgs<ExtArgs>
+  deliveriesCreated?: boolean | Prisma.User$deliveriesCreatedArgs<ExtArgs>
+  deliveriesUpdated?: boolean | Prisma.User$deliveriesUpdatedArgs<ExtArgs>
+  deliveriesReceived?: boolean | Prisma.User$deliveriesReceivedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1137,6 +1923,11 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   passwordResetOTPs?: boolean | Prisma.User$passwordResetOTPsArgs<ExtArgs>
   warehouseMemberships?: boolean | Prisma.User$warehouseMembershipsArgs<ExtArgs>
   stockMovements?: boolean | Prisma.User$stockMovementsArgs<ExtArgs>
+  receiptsCreated?: boolean | Prisma.User$receiptsCreatedArgs<ExtArgs>
+  receiptsUpdated?: boolean | Prisma.User$receiptsUpdatedArgs<ExtArgs>
+  deliveriesCreated?: boolean | Prisma.User$deliveriesCreatedArgs<ExtArgs>
+  deliveriesUpdated?: boolean | Prisma.User$deliveriesUpdatedArgs<ExtArgs>
+  deliveriesReceived?: boolean | Prisma.User$deliveriesReceivedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1151,6 +1942,11 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     passwordResetOTPs: Prisma.$PasswordResetOTPPayload<ExtArgs>[]
     warehouseMemberships: Prisma.$WarehouseMemberPayload<ExtArgs>[]
     stockMovements: Prisma.$StockMovementPayload<ExtArgs>[]
+    receiptsCreated: Prisma.$ReceiptPayload<ExtArgs>[]
+    receiptsUpdated: Prisma.$ReceiptPayload<ExtArgs>[]
+    deliveriesCreated: Prisma.$DeliveryPayload<ExtArgs>[]
+    deliveriesUpdated: Prisma.$DeliveryPayload<ExtArgs>[]
+    deliveriesReceived: Prisma.$DeliveryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1561,6 +2357,11 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   passwordResetOTPs<T extends Prisma.User$passwordResetOTPsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$passwordResetOTPsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordResetOTPPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   warehouseMemberships<T extends Prisma.User$warehouseMembershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$warehouseMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WarehouseMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   stockMovements<T extends Prisma.User$stockMovementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$stockMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  receiptsCreated<T extends Prisma.User$receiptsCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$receiptsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReceiptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  receiptsUpdated<T extends Prisma.User$receiptsUpdatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$receiptsUpdatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReceiptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  deliveriesCreated<T extends Prisma.User$deliveriesCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deliveriesCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  deliveriesUpdated<T extends Prisma.User$deliveriesUpdatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deliveriesUpdatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  deliveriesReceived<T extends Prisma.User$deliveriesReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deliveriesReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2127,6 +2928,126 @@ export type User$stockMovementsArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.StockMovementScalarFieldEnum | Prisma.StockMovementScalarFieldEnum[]
+}
+
+/**
+ * User.receiptsCreated
+ */
+export type User$receiptsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Receipt
+   */
+  select?: Prisma.ReceiptSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Receipt
+   */
+  omit?: Prisma.ReceiptOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReceiptInclude<ExtArgs> | null
+  where?: Prisma.ReceiptWhereInput
+  orderBy?: Prisma.ReceiptOrderByWithRelationInput | Prisma.ReceiptOrderByWithRelationInput[]
+  cursor?: Prisma.ReceiptWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReceiptScalarFieldEnum | Prisma.ReceiptScalarFieldEnum[]
+}
+
+/**
+ * User.receiptsUpdated
+ */
+export type User$receiptsUpdatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Receipt
+   */
+  select?: Prisma.ReceiptSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Receipt
+   */
+  omit?: Prisma.ReceiptOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReceiptInclude<ExtArgs> | null
+  where?: Prisma.ReceiptWhereInput
+  orderBy?: Prisma.ReceiptOrderByWithRelationInput | Prisma.ReceiptOrderByWithRelationInput[]
+  cursor?: Prisma.ReceiptWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReceiptScalarFieldEnum | Prisma.ReceiptScalarFieldEnum[]
+}
+
+/**
+ * User.deliveriesCreated
+ */
+export type User$deliveriesCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Delivery
+   */
+  select?: Prisma.DeliverySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Delivery
+   */
+  omit?: Prisma.DeliveryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryInclude<ExtArgs> | null
+  where?: Prisma.DeliveryWhereInput
+  orderBy?: Prisma.DeliveryOrderByWithRelationInput | Prisma.DeliveryOrderByWithRelationInput[]
+  cursor?: Prisma.DeliveryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeliveryScalarFieldEnum | Prisma.DeliveryScalarFieldEnum[]
+}
+
+/**
+ * User.deliveriesUpdated
+ */
+export type User$deliveriesUpdatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Delivery
+   */
+  select?: Prisma.DeliverySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Delivery
+   */
+  omit?: Prisma.DeliveryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryInclude<ExtArgs> | null
+  where?: Prisma.DeliveryWhereInput
+  orderBy?: Prisma.DeliveryOrderByWithRelationInput | Prisma.DeliveryOrderByWithRelationInput[]
+  cursor?: Prisma.DeliveryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeliveryScalarFieldEnum | Prisma.DeliveryScalarFieldEnum[]
+}
+
+/**
+ * User.deliveriesReceived
+ */
+export type User$deliveriesReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Delivery
+   */
+  select?: Prisma.DeliverySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Delivery
+   */
+  omit?: Prisma.DeliveryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryInclude<ExtArgs> | null
+  where?: Prisma.DeliveryWhereInput
+  orderBy?: Prisma.DeliveryOrderByWithRelationInput | Prisma.DeliveryOrderByWithRelationInput[]
+  cursor?: Prisma.DeliveryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeliveryScalarFieldEnum | Prisma.DeliveryScalarFieldEnum[]
 }
 
 /**

@@ -62,7 +62,12 @@ export const ModelName = {
   ProductCategory: 'ProductCategory',
   Product: 'Product',
   StockLevel: 'StockLevel',
-  StockMovement: 'StockMovement'
+  StockMovement: 'StockMovement',
+  Vendor: 'Vendor',
+  Receipt: 'Receipt',
+  ReceiptItem: 'ReceiptItem',
+  Delivery: 'Delivery',
+  DeliveryItem: 'DeliveryItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -252,10 +257,87 @@ export const StockMovementScalarFieldEnum = {
   quantity: 'quantity',
   reference: 'reference',
   notes: 'notes',
+  status: 'status',
   createdAt: 'createdAt'
 } as const
 
 export type StockMovementScalarFieldEnum = (typeof StockMovementScalarFieldEnum)[keyof typeof StockMovementScalarFieldEnum]
+
+
+export const VendorScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  companyName: 'companyName',
+  email: 'email',
+  phone: 'phone',
+  address: 'address',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VendorScalarFieldEnum = (typeof VendorScalarFieldEnum)[keyof typeof VendorScalarFieldEnum]
+
+
+export const ReceiptScalarFieldEnum = {
+  id: 'id',
+  referenceNumber: 'referenceNumber',
+  vendorId: 'vendorId',
+  warehouseId: 'warehouseId',
+  status: 'status',
+  createdById: 'createdById',
+  updatedById: 'updatedById',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReceiptScalarFieldEnum = (typeof ReceiptScalarFieldEnum)[keyof typeof ReceiptScalarFieldEnum]
+
+
+export const ReceiptItemScalarFieldEnum = {
+  id: 'id',
+  receiptId: 'receiptId',
+  productId: 'productId',
+  locationId: 'locationId',
+  quantityOrdered: 'quantityOrdered',
+  quantityReceived: 'quantityReceived',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReceiptItemScalarFieldEnum = (typeof ReceiptItemScalarFieldEnum)[keyof typeof ReceiptItemScalarFieldEnum]
+
+
+export const DeliveryScalarFieldEnum = {
+  id: 'id',
+  referenceNumber: 'referenceNumber',
+  vendorId: 'vendorId',
+  userId: 'userId',
+  warehouseId: 'warehouseId',
+  status: 'status',
+  createdById: 'createdById',
+  updatedById: 'updatedById',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DeliveryScalarFieldEnum = (typeof DeliveryScalarFieldEnum)[keyof typeof DeliveryScalarFieldEnum]
+
+
+export const DeliveryItemScalarFieldEnum = {
+  id: 'id',
+  deliveryId: 'deliveryId',
+  productId: 'productId',
+  locationId: 'locationId',
+  quantityOrdered: 'quantityOrdered',
+  quantityDelivered: 'quantityDelivered',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DeliveryItemScalarFieldEnum = (typeof DeliveryItemScalarFieldEnum)[keyof typeof DeliveryItemScalarFieldEnum]
 
 
 export const SortOrder = {

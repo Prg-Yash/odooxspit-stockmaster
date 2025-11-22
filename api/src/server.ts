@@ -10,6 +10,10 @@ import { userRouter } from "./routes/user.route";
 import { warehouseRouter } from "./routes/warehouse.route";
 import { productRouter } from "./routes/product.route";
 import { stockRouter } from "./routes/stock.route";
+import vendorRouter from "./routes/vendor.route";
+import receiptRouter from "./routes/receipt.route";
+import deliveryRouter from "./routes/delivery.route";
+import moveHistoryRouter from "./routes/move-history.route";
 
 const app = express();
 
@@ -62,6 +66,10 @@ app.use("/user", userRouter);
 app.use("/warehouses", warehouseRouter);
 app.use("/products", productRouter);
 app.use("/stocks", stockRouter);
+app.use("/vendors", vendorRouter);
+app.use("/receipts", receiptRouter);
+app.use("/deliveries", deliveryRouter);
+app.use("/moves", moveHistoryRouter);
 
 // 404 handler
 app.use((req, res) => {

@@ -9,6 +9,10 @@ A complete warehouse and inventory management system built with Node.js, Express
 - **Product Management** - CRUD operations for products with categories and SKU tracking
 - **Inventory Management** - Real-time stock tracking with location-based inventory
 - **Stock Movements** - Complete audit trail of all inventory transactions
+- **Vendor Management** - Track vendors with transaction history
+- **Receipt Management** - Stock IN operations with DRAFT→READY→DONE workflow
+- **Delivery Management** - Stock OUT operations with stock validation
+- **Move History** - Kanban-style movement tracking with filtering
 - **Low Stock Alerts** - Automatic monitoring of reorder levels
 
 ## Architecture
@@ -73,7 +77,13 @@ SMTP_FROM=noreply@stockmaster.com
 After updating the schema, run migrations:
 
 ```bash
+# For new extensions (vendor, receipt, delivery system)
+npx prisma migrate dev --name add_vendor_receipt_delivery_system
+
+# For initial setup
 npx prisma migrate dev --name initial_setup
+
+# Generate Prisma client after any schema change
 npx prisma generate
 ```
 
@@ -160,9 +170,24 @@ npm start
      "userId": "user_id_from_step_6",
      "role": "MANAGER"  // or "STAFF"
    }
+   
+   Note: Users can only be members of ONE warehouse at a time.
+   If user is already in another warehouse, they'll get a 409 error
+   and must leave their current warehouse first.
 ```
 
-### 4. Member Access Flow
+### 4. Switching Warehouses
+```
+If a user needs to switch to a different warehouse:
+
+1. User leaves current warehouse → POST /warehouses/leave
+   Response: { "success": true, "message": "Successfully left warehouse..." }
+
+2. Manager/Owner can now add them to new warehouse → POST /warehouses/:newWarehouseId/members
+   { "userId": "user_id", "role": "STAFF" }
+```
+
+### 6. Member Access Flow
 ```
 9. Manager logs in → POST /auth/login
    {
@@ -180,7 +205,7 @@ npm start
     - Perform stock operations (all roles)
 ```
 
-### 5. Role-Based Operations
+### 7. Role-Based Operations
 
 **OWNER (System Role)**:
 - ✅ Access ALL warehouses automatically
@@ -659,8 +684,58 @@ Authorization: Bearer <token>
 **Notes**:
 - User must already be registered in the system
 - User cannot be added twice to the same warehouse
+- User can only be a member of ONE warehouse at a time
+- If user is already in another warehouse, returns 409 error with existing warehouse details
+- User must leave their current warehouse before joining a new one
 - MANAGER role allows full warehouse management
 - STAFF role allows only stock operations
+
+**Error Response (409) - User Already in Warehouse**:
+```json
+{
+  "success": false,
+  "message": "User is already a member of warehouse \"Main Warehouse\" (WH001). They must leave that warehouse first.",
+  "code": "ALREADY_IN_WAREHOUSE",
+  "existingWarehouse": {
+    "id": "warehouse_id",
+    "name": "Main Warehouse",
+    "code": "WH001"
+  }
+}
+```
+
+#### Leave Warehouse
+```http
+POST /warehouses/leave
+Authorization: Bearer <token>
+```
+
+Allows a user to leave their current warehouse. After leaving, they can be added to a different warehouse.
+
+**Response (200)**:
+```json
+{
+  "success": true,
+  "message": "Successfully left warehouse \"Main Warehouse\"",
+  "data": {
+    "leftWarehouse": {
+      "id": "warehouse_id",
+      "name": "Main Warehouse",
+      "code": "WH001"
+    }
+  }
+}
+```
+
+**Error Response (400) - Not in Warehouse**:
+```json
+{
+  "success": false,
+  "message": "You are not a member of any warehouse"
+}
+```
+
+**Note**: System OWNERs are not members of warehouses, so this endpoint is for MANAGER and STAFF users only.
 
 #### Update Member Role
 ```http
@@ -964,6 +1039,439 @@ Authorization: Bearer <token>
 
 Returns overview statistics and recent movements
 
+### Vendor Management
+
+#### Create Vendor
+```http
+POST /vendors
+Authorization: Bearer <token>
+
+{
+  "name": "ABC Suppliers",
+  "email": "contact@abcsuppliers.com",
+  "phone": "+91-1234567890",
+  "address": "123 Vendor St, Mumbai"
+}
+```
+
+**Permission**: Warehouse MANAGER or OWNER  
+**Response (201)**:
+```json
+{
+  "id": "vendor_id",
+  "name": "ABC Suppliers",
+  "email": "contact@abcsuppliers.com",
+  "phone": "+91-1234567890",
+  "address": "123 Vendor St, Mumbai",
+  "isActive": true,
+  "createdAt": "2025-01-20T10:00:00.000Z"
+}
+```
+
+#### Get All Vendors
+```http
+GET /vendors?isActive=true
+Authorization: Bearer <token>
+```
+
+**Response (200)**:
+```json
+[
+  {
+    "id": "vendor_id",
+    "name": "ABC Suppliers",
+    "email": "contact@abcsuppliers.com",
+    "isActive": true
+  }
+]
+```
+
+#### Get Vendor by ID
+```http
+GET /vendors/:id
+Authorization: Bearer <token>
+```
+
+**Response**: Includes recent receipts and deliveries
+
+#### Get Vendor History
+```http
+GET /vendors/:id/history
+Authorization: Bearer <token>
+```
+
+**Response**: Summary of incoming receipts and outgoing deliveries
+
+#### Update Vendor
+```http
+PUT /vendors/:id
+Authorization: Bearer <token>
+
+{
+  "name": "Updated Supplier Name",
+  "isActive": false
+}
+```
+
+**Permission**: Warehouse MANAGER or OWNER
+
+#### Delete Vendor
+```http
+DELETE /vendors/:id
+Authorization: Bearer <token>
+```
+
+**Permission**: Warehouse MANAGER or OWNER  
+**Note**: Cannot delete if draft receipts exist
+
+---
+
+### Receipt Management (Stock IN)
+
+Receipts follow a three-stage workflow:
+1. **DRAFT** - Editable, no stock impact
+2. **READY** - Validated, locked for editing
+3. **DONE** - Stock applied, immutable
+
+#### Create Receipt
+```http
+POST /receipts
+Authorization: Bearer <token>
+
+{
+  "vendorId": "vendor_id",
+  "warehouseId": "warehouse_id",
+  "items": [
+    {
+      "productId": "product_id",
+      "locationId": "location_id",
+      "quantity": 100,
+      "unitPrice": 50.00
+    }
+  ],
+  "notes": "Purchase order PO-12345"
+}
+```
+
+**Permission**: Warehouse MANAGER or OWNER  
+**Response (201)**:
+```json
+{
+  "id": "receipt_id",
+  "referenceNumber": "RCP-20250120-0001",
+  "vendorId": "vendor_id",
+  "warehouseId": "warehouse_id",
+  "status": "DRAFT",
+  "items": [
+    {
+      "productId": "product_id",
+      "locationId": "location_id",
+      "quantity": 100,
+      "unitPrice": 50.00
+    }
+  ],
+  "totalAmount": 5000.00,
+  "createdAt": "2025-01-20T10:00:00.000Z"
+}
+```
+
+**Note**: Reference number is auto-generated (RCP-YYYYMMDD-####)
+
+#### Get All Receipts
+```http
+GET /receipts?vendorId=xxx&warehouseId=yyy&status=DRAFT&startDate=2025-01-01&endDate=2025-01-31
+Authorization: Bearer <token>
+```
+
+**Query Parameters**:
+- `vendorId` - Filter by vendor
+- `warehouseId` - Filter by warehouse
+- `status` - Filter by status (DRAFT, READY, DONE)
+- `startDate` - Start date (ISO format)
+- `endDate` - End date (ISO format)
+
+#### Get Receipt by ID
+```http
+GET /receipts/:id
+Authorization: Bearer <token>
+```
+
+**Response**: Includes vendor, warehouse, items with product/location details
+
+#### Update Receipt
+```http
+PUT /receipts/:id
+Authorization: Bearer <token>
+
+{
+  "items": [
+    {
+      "productId": "product_id",
+      "locationId": "location_id",
+      "quantity": 150,
+      "unitPrice": 55.00
+    }
+  ],
+  "notes": "Updated quantities"
+}
+```
+
+**Permission**: Warehouse MANAGER or OWNER  
+**Note**: Only DRAFT receipts can be edited
+
+#### Update Receipt Status
+```http
+PATCH /receipts/:id/status
+Authorization: Bearer <token>
+
+{
+  "status": "READY"
+}
+```
+
+**Permission**: Warehouse MANAGER or OWNER  
+**Workflow**:
+- DRAFT → READY: Validates receipt
+- READY → DONE: Applies stock changes using transactions
+- Invalid transitions are rejected
+
+**Response**: Updated receipt with new status
+
+#### Delete Receipt
+```http
+DELETE /receipts/:id
+Authorization: Bearer <token>
+```
+
+**Permission**: Warehouse MANAGER or OWNER  
+**Note**: Only DRAFT receipts can be deleted
+
+#### Print Receipt PDF
+```http
+GET /receipts/:id/print
+Authorization: Bearer <token>
+```
+
+**Note**: Currently returns 501 Not Implemented
+
+---
+
+### Delivery Management (Stock OUT)
+
+Deliveries follow the same three-stage workflow as receipts.
+
+#### Create Delivery
+```http
+POST /deliveries
+Authorization: Bearer <token>
+
+{
+  "vendorId": "vendor_id",
+  "warehouseId": "warehouse_id",
+  "items": [
+    {
+      "productId": "product_id",
+      "locationId": "location_id",
+      "quantity": 50,
+      "unitPrice": 75.00
+    }
+  ],
+  "notes": "Sales order SO-67890"
+}
+```
+
+**Or** (for non-vendor delivery):
+```json
+{
+  "userId": "user_id",
+  "warehouseId": "warehouse_id",
+  "items": [...],
+  "notes": "Internal transfer"
+}
+```
+
+**Permission**: Warehouse MANAGER or OWNER  
+**Response (201)**: Similar to receipt with auto-generated reference (DLV-YYYYMMDD-####)
+
+#### Get All Deliveries
+```http
+GET /deliveries?vendorId=xxx&userId=yyy&warehouseId=zzz&status=READY
+Authorization: Bearer <token>
+```
+
+**Query Parameters**: Same as receipts plus `userId`
+
+#### Get Delivery by ID
+```http
+GET /deliveries/:id
+Authorization: Bearer <token>
+```
+
+#### Update Delivery
+```http
+PUT /deliveries/:id
+Authorization: Bearer <token>
+
+{
+  "items": [
+    {
+      "productId": "product_id",
+      "locationId": "location_id",
+      "quantity": 75
+    }
+  ]
+}
+```
+
+**Permission**: Warehouse MANAGER or OWNER  
+**Note**: Only DRAFT deliveries can be edited
+
+#### Update Delivery Status
+```http
+PATCH /deliveries/:id/status
+Authorization: Bearer <token>
+
+{
+  "status": "READY"
+}
+```
+
+**Permission**: Warehouse MANAGER or OWNER  
+**Workflow**:
+- DRAFT → READY: Validates stock availability
+- READY → DONE: Applies negative stock changes
+- Insufficient stock prevents transition to READY
+
+#### Delete Delivery
+```http
+DELETE /deliveries/:id
+Authorization: Bearer <token>
+```
+
+**Permission**: Warehouse MANAGER or OWNER  
+**Note**: Only DRAFT deliveries can be deleted
+
+#### Print Delivery PDF
+```http
+GET /deliveries/:id/print
+Authorization: Bearer <token>
+```
+
+**Note**: Currently returns 501 Not Implemented
+
+---
+
+### Move History (Stock Movement Tracking)
+
+#### Get All Movements
+```http
+GET /moves?productId=xxx&warehouseId=yyy&type=RECEIPT&status=PENDING&startDate=2025-01-01&limit=100&offset=0
+Authorization: Bearer <token>
+```
+
+**Query Parameters**:
+- `productId` - Filter by product
+- `warehouseId` - Filter by warehouse
+- `type` - Movement type (RECEIPT, DELIVERY, ADJUSTMENT, TRANSFER_IN, TRANSFER_OUT)
+- `status` - Movement status (PENDING, APPROVED, REJECTED)
+- `startDate` - Start date (ISO format)
+- `endDate` - End date (ISO format)
+- `limit` - Max results (default 100)
+- `offset` - Pagination offset
+
+**Response (200)**:
+```json
+{
+  "movements": [
+    {
+      "id": "movement_id",
+      "productId": "product_id",
+      "warehouseId": "warehouse_id",
+      "locationId": "location_id",
+      "quantity": 100,
+      "type": "RECEIPT",
+      "status": "PENDING",
+      "reference": "RCP-20250120-0001",
+      "createdAt": "2025-01-20T10:00:00.000Z",
+      "product": {
+        "sku": "PROD001",
+        "name": "Product Name"
+      },
+      "warehouse": {
+        "name": "Main Warehouse"
+      },
+      "location": {
+        "name": "A1-Shelf-2"
+      },
+      "user": {
+        "name": "John Manager"
+      }
+    }
+  ],
+  "pagination": {
+    "total": 150,
+    "limit": 100,
+    "offset": 0
+  }
+}
+```
+
+#### Get Movement by ID
+```http
+GET /moves/:id
+Authorization: Bearer <token>
+```
+
+#### Update Movement Status (Kanban)
+```http
+PATCH /moves/:id/status
+Authorization: Bearer <token>
+
+{
+  "status": "APPROVED"
+}
+```
+
+**Permission**: Warehouse MANAGER or OWNER  
+**Note**: Allows Kanban-style workflow (drag-and-drop status changes)
+
+#### Get Movement Summary by Warehouse
+```http
+GET /moves/summary/:warehouseId?startDate=2025-01-01&endDate=2025-01-31
+Authorization: Bearer <token>
+```
+
+**Response**:
+```json
+{
+  "totalMovements": 250,
+  "byType": {
+    "RECEIPT": 100,
+    "DELIVERY": 80,
+    "ADJUSTMENT": 20,
+    "TRANSFER_IN": 25,
+    "TRANSFER_OUT": 25
+  },
+  "byStatus": {
+    "PENDING": 10,
+    "APPROVED": 230,
+    "REJECTED": 10
+  },
+  "totalQuantityIn": 5000,
+  "totalQuantityOut": 3500
+}
+```
+
+#### Get Vendor Movements
+```http
+GET /moves/vendor/:vendorId
+Authorization: Bearer <token>
+```
+
+**Response**: All receipts and deliveries for a vendor with associated movements
+
+---
+
 ## Inventory Transaction Flow
 
 All stock changes follow a transactional pattern:
@@ -1006,7 +1514,12 @@ await applyStockChange({
 - **ProductCategory** - Optional product categorization
 - **Product** - Product definitions with SKU
 - **StockLevel** - Current stock quantities (product + location)
-- **StockMovement** - Immutable audit log of all stock changes
+- **StockMovement** - Immutable audit log of all stock changes (now includes status field)
+- **Vendor** - Vendor/supplier information
+- **Receipt** - Incoming stock documents with workflow status
+- **ReceiptItem** - Line items in receipts
+- **Delivery** - Outgoing stock documents with workflow status
+- **DeliveryItem** - Line items in deliveries
 
 ### Enums
 
@@ -1014,6 +1527,9 @@ await applyStockChange({
 - **WarehouseMemberRole**: MANAGER, STAFF
 - **UnitOfMeasure**: PIECE, KG, GRAM, LITER, ML, METER, CM, BOX, PACK
 - **StockMovementType**: RECEIPT, DELIVERY, ADJUSTMENT, TRANSFER_IN, TRANSFER_OUT
+- **MovementStatus**: PENDING, APPROVED, REJECTED
+- **ReceiptStatus**: DRAFT, READY, DONE
+- **DeliveryStatus**: DRAFT, READY, DONE
 
 ## Security Features
 
@@ -1187,6 +1703,275 @@ POST /stocks/warehouse/:warehouseId/receive
 - POST `/stocks/warehouse/:id/deliver` - Deliver stock
 - POST `/stocks/adjust` - Adjust stock
 - POST `/stocks/transfer` - Transfer stock
+
+## Testing
+
+The API includes a comprehensive automated test suite covering all modules with real API endpoint testing (no mocks).
+
+### Test Technology Stack
+
+- **Vitest** - Fast TypeScript test runner
+- **Supertest** - HTTP assertion library for API testing
+- **Prisma** - Database management with test isolation
+- **Real Database** - Tests run against actual PostgreSQL test database
+
+### Test Structure
+
+```
+tests/
+├── setup/
+│   ├── test-env.ts         # Environment configuration
+│   ├── test-db.ts          # Database setup and cleanup
+│   ├── seed.ts             # Test data seeding
+│   └── auth-helper.ts      # Authentication utilities
+└── modules/
+    ├── auth.test.ts        # Authentication & authorization
+    ├── warehouse.test.ts   # Warehouse CRUD & permissions
+    ├── vendors.test.ts     # Vendor management
+    ├── products.test.ts    # Product & category management
+    ├── stock.test.ts       # Stock operations (receive, deliver, adjust, transfer)
+    ├── receipts.test.ts    # Receipt workflow (DRAFT→READY→DONE)
+    ├── deliveries.test.ts  # Delivery workflow
+    └── move-history.test.ts # Movement tracking & status
+```
+
+### Setup Test Environment
+
+1. **Create Test Database**
+
+Create a separate PostgreSQL database for testing:
+
+```bash
+# Using psql
+createdb stockmaster_test
+
+# Or through PostgreSQL client
+CREATE DATABASE stockmaster_test;
+```
+
+2. **Configure Test Environment**
+
+Add `DATABASE_URL_TEST` to your `.env` file:
+
+```env
+# Test Database (separate from production)
+DATABASE_URL_TEST=postgresql://user:password@localhost:5432/stockmaster_test
+```
+
+3. **Run Migrations on Test Database**
+
+```bash
+# Set DATABASE_URL to test database temporarily
+DATABASE_URL=$DATABASE_URL_TEST npx prisma migrate deploy
+
+# Or on Windows PowerShell
+$env:DATABASE_URL=$env:DATABASE_URL_TEST; npx prisma migrate deploy
+```
+
+### Running Tests
+
+#### Run All Tests
+```bash
+npm test
+```
+
+#### Run Tests in Watch Mode
+```bash
+npm run test:watch
+```
+
+#### Run Tests with UI
+```bash
+npm run test:ui
+```
+
+#### Run E2E Tests
+```bash
+npm run test:e2e
+```
+
+#### Run Tests with Coverage
+```bash
+npm run test:coverage
+```
+
+### Seed Test Database
+
+To populate the test database with sample data:
+
+```bash
+npm run seed
+```
+
+**Seeded Test Data**:
+- 3 Users: Owner, Manager, Staff (with verified emails)
+- 2 Warehouses: Main and Secondary
+- 2 Locations: Main Storage, Secondary Storage
+- 2 Categories: Electronics, Furniture
+- 2 Products: Laptop, Mouse (with initial stock)
+- 2 Vendors: Test Supplier 1, Test Supplier 2
+
+**Test Credentials**:
+```
+Owner:   owner@test.com   / Owner@123
+Manager: manager@test.com / Manager@123
+Staff:   staff@test.com   / Staff@123
+```
+
+### Test Coverage by Module
+
+| Module | Tests | Coverage |
+|--------|-------|----------|
+| **Auth** | Registration, Login, Logout, Refresh Token, Email Verification | ✅ Complete |
+| **User** | Profile, Update, Delete Account | ✅ Complete |
+| **Warehouse** | CRUD, Members, Locations, Role Permissions | ✅ Complete |
+| **Vendors** | CRUD, History, Role Permissions | ✅ Complete |
+| **Products** | Categories, Products CRUD, Stock Summary, Low Stock | ✅ Complete |
+| **Stock** | Receive, Deliver, Adjust, Transfer, Levels, Movements | ✅ Complete |
+| **Receipts** | Create, Update, Status Workflow (DRAFT→READY→DONE) | ✅ Complete |
+| **Deliveries** | Create, Update, Status Workflow, Stock Validation | ✅ Complete |
+| **Move History** | Get Movements, Filter, Status Updates, Summary | ✅ Complete |
+
+### Test Features
+
+#### Real API Testing
+- Tests use actual HTTP requests via Supertest
+- No mocked responses or fake data
+- Tests run against real PostgreSQL database
+- Full request/response validation
+
+#### Permission Testing
+- Every module tests OWNER, MANAGER, and STAFF roles
+- Validates proper authorization enforcement
+- Tests blocked operations return 403 Forbidden
+
+#### Workflow Testing
+- Receipt workflow: DRAFT → READY → DONE
+- Delivery workflow: DRAFT → READY → DONE
+- Stock validation on transitions
+- Cannot edit non-DRAFT documents
+
+#### Data Integrity Testing
+- Foreign key validation
+- Duplicate prevention (SKU, email)
+- Stock level validation (no negative stock)
+- Transaction safety (all-or-nothing operations)
+
+### Test Isolation
+
+Each test suite:
+1. Sets up clean database state before all tests
+2. Seeds required test data
+3. Authenticates test users automatically
+4. Runs tests independently
+5. Cleans up database after all tests
+
+### Authentication Helper
+
+Tests use automated login helpers:
+
+```typescript
+import { getOwnerTokens, getManagerTokens, getStaffTokens } from '../setup/auth-helper';
+
+// Get authenticated tokens
+const ownerTokens = await getOwnerTokens(app);
+const ownerToken = ownerTokens.accessToken;
+
+// Make authenticated request
+const response = await request(app)
+  .post('/warehouses')
+  .set({ Authorization: `Bearer ${ownerToken}` })
+  .send({ name: 'New Warehouse', ... });
+```
+
+### Example Test
+
+```typescript
+describe('Warehouse API', () => {
+  it('should create warehouse as owner', async () => {
+    const response = await request(app)
+      .post('/warehouses')
+      .set(authHeader(ownerToken))
+      .send({
+        name: 'Main Warehouse',
+        code: 'WH-MAIN',
+        address: '123 Street',
+        city: 'Mumbai',
+        state: 'Maharashtra',
+        country: 'India',
+        postalCode: '400001',
+      });
+
+    expect(response.status).toBe(201);
+    expect(response.body.success).toBe(true);
+    expect(response.body.data.name).toBe('Main Warehouse');
+  });
+
+  it('should block warehouse creation as staff', async () => {
+    const response = await request(app)
+      .post('/warehouses')
+      .set(authHeader(staffToken))
+      .send({ name: 'Unauthorized Warehouse', ... });
+
+    expect(response.status).toBe(403);
+    expect(response.body.success).toBe(false);
+  });
+});
+```
+
+### CI/CD Integration
+
+Tests can be integrated into CI/CD pipelines:
+
+```yaml
+# GitHub Actions example
+- name: Run Tests
+  run: |
+    npm install
+    npm run test
+  env:
+    DATABASE_URL: ${{ secrets.DATABASE_URL_TEST }}
+    JWT_SECRET: ${{ secrets.JWT_SECRET }}
+```
+
+### Troubleshooting
+
+**Database Connection Issues**:
+- Ensure PostgreSQL is running
+- Verify `DATABASE_URL_TEST` is correct
+- Check database user has proper permissions
+
+**Test Failures**:
+- Run `npm run seed` to reset test data
+- Ensure migrations are up to date
+- Check for port conflicts (default: 8000)
+
+**Timeout Errors**:
+- Tests have 30s timeout (configurable in `vitest.config.ts`)
+- Slow database? Increase `testTimeout` value
+
+### Best Practices
+
+1. **Run tests before committing** to catch issues early
+2. **Keep test database separate** from development database
+3. **Seed before testing** to ensure consistent data state
+4. **Review coverage reports** to identify untested code
+5. **Update tests** when adding new features
+
+### Test Execution Flow
+
+```mermaid
+graph TD
+    A[Start Tests] --> B[Load Environment]
+    B --> C[Connect to Test DB]
+    C --> D[Reset Database]
+    D --> E[Seed Test Data]
+    E --> F[Authenticate Users]
+    F --> G[Run Test Suites]
+    G --> H[Cleanup Database]
+    H --> I[Disconnect DB]
+    I --> J[Generate Report]
+```
 
 ## License
 

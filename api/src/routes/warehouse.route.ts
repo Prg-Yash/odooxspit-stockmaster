@@ -12,6 +12,9 @@ const warehouseController = new WarehouseController();
 // All warehouse routes require authentication
 router.use(requireAuth);
 
+// User leaves their current warehouse
+router.post("/leave", warehouseController.leaveWarehouse.bind(warehouseController));
+
 // Warehouse CRUD
 router.post(
     "/",

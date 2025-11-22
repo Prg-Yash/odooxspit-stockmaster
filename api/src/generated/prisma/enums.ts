@@ -50,3 +50,30 @@ export const StockMovementType = {
 } as const
 
 export type StockMovementType = (typeof StockMovementType)[keyof typeof StockMovementType]
+
+
+export const MovementStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type MovementStatus = (typeof MovementStatus)[keyof typeof MovementStatus]
+
+
+export const ReceiptStatus = {
+  DRAFT: 'DRAFT',
+  READY: 'READY',
+  DONE: 'DONE'
+} as const
+
+export type ReceiptStatus = (typeof ReceiptStatus)[keyof typeof ReceiptStatus]
+
+
+export const DeliveryStatus = {
+  DRAFT: 'DRAFT',
+  READY: 'READY',
+  DONE: 'DONE'
+} as const
+
+export type DeliveryStatus = (typeof DeliveryStatus)[keyof typeof DeliveryStatus]
