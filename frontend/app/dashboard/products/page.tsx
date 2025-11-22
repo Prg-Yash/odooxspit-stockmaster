@@ -26,7 +26,7 @@ export default function ProductsPage() {
 
         // First, get user's warehouses
         const warehousesResponse = await getWarehouses()
-        
+
         if (!warehousesResponse.success || !warehousesResponse.data?.length) {
           setError("No warehouse found. Please create or join a warehouse first.")
           setIsLoading(false)
@@ -50,7 +50,7 @@ export default function ProductsPage() {
         }
       } catch (err: any) {
         console.error("Error fetching products:", err)
-        
+
         if (err.status === 401) {
           setError("Authentication required. Please log in again.")
           // Redirect to login after a delay
@@ -77,7 +77,7 @@ export default function ProductsPage() {
 
     try {
       const response = await deleteProduct(productId)
-      
+
       if (response.success) {
         toast.success("Product deleted successfully")
         // Refresh the products list
@@ -87,7 +87,7 @@ export default function ProductsPage() {
       }
     } catch (err: any) {
       console.error("Error deleting product:", err)
-      
+
       if (err.status === 403) {
         toast.error("You don't have permission to delete products. Manager role required.")
       } else {

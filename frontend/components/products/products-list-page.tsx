@@ -13,10 +13,10 @@ interface ProductsListPageProps {
 	onRefresh: () => void
 }
 
-export function ProductsListPage({ 
-	products, 
+export function ProductsListPage({
+	products,
 	warehouseId,
-	onEditProduct, 
+	onEditProduct,
 	onViewProduct,
 	onDeleteProduct,
 	onRefresh
@@ -123,28 +123,28 @@ export function ProductsListPage({
 										</td>
 										<td className="p-3 text-center">
 											<div className="flex gap-1 justify-center">
-												<Button 
-													size="icon" 
-													variant="ghost" 
-													onClick={() => onViewProduct(product.id)} 
+												<Button
+													size="icon"
+													variant="ghost"
+													onClick={() => onViewProduct(product.id)}
 													title="View Details"
 													className="h-8 w-8"
 												>
 													<Eye size={16} />
 												</Button>
-												<Button 
-													size="icon" 
-													variant="ghost" 
-													onClick={() => onEditProduct(product.id)} 
+												<Button
+													size="icon"
+													variant="ghost"
+													onClick={() => onEditProduct(product.id)}
 													title="Edit Product"
 													className="h-8 w-8"
 												>
 													<Edit2 size={16} />
 												</Button>
-												<Button 
-													size="icon" 
-													variant="ghost" 
-													onClick={() => onDeleteProduct(product.id)} 
+												<Button
+													size="icon"
+													variant="ghost"
+													onClick={() => onDeleteProduct(product.id)}
 													title="Delete Product"
 													className="h-8 w-8 text-destructive hover:text-destructive"
 												>
