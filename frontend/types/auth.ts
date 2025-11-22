@@ -51,3 +51,4 @@ export interface InviteUserData {
   role: "manager" | "employee"
   warehouseId?: string
 }
+

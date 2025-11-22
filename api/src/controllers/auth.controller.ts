@@ -90,7 +90,6 @@ async function register(req: Request, res: Response) {
       data.email
     );
 
-    // Send verification email
     await sendVerificationEmail(data.email, verificationToken);
 
     res.status(201).json({
@@ -121,10 +120,9 @@ async function verifyEmail(req: Request, res: Response) {
     const { token, email } = req.query;
 
     if (!token || !email) {
-      return res.status(400).json({
-        success: false,
-        message: "Token and email are required.",
-      });
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/verify/error?reason=missing_params`
+      );
     }
 
     // Verify token
@@ -134,10 +132,9 @@ async function verifyEmail(req: Request, res: Response) {
     );
 
     if (!verificationToken) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid or expired verification token.",
-      });
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/verify/error?reason=invalid_or_expired`
+      );
     }
 
     // Update user's emailVerified status
@@ -155,16 +152,12 @@ async function verifyEmail(req: Request, res: Response) {
       verificationToken.user.name as string
     );
 
-    res.status(200).json({
-      success: true,
-      message: "Email verified successfully. You can now log in.",
-    });
+    return res.redirect(`${process.env.FRONTEND_URL}/verify/success`);
   } catch (error) {
     console.error("Verify email error:", error);
-    res.status(500).json({
-      success: false,
-      message: "An error occurred during email verification.",
-    });
+    return res.redirect(
+      `${process.env.FRONTEND_URL}/verify/error?reason=internal_server_error`
+    );
   }
 }
 
@@ -236,7 +229,7 @@ async function login(req: Request, res: Response) {
       os: deviceInfo.os,
     });
 
-    // Set refresh token in cookie
+    res.cookie("accessToken", accessToken, COOKIE_OPTIONS);
     res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
 
     res.status(200).json({
