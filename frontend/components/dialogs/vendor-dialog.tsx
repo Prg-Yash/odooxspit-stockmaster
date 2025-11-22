@@ -34,9 +34,10 @@ interface VendorDialogProps {
   vendors: Vendor[];
   setVendors: (vendors: Vendor[]) => void;
   trigger?: React.ReactNode;
+  onRefresh?: () => void;
 }
 
-function VendorForm({ vendor }: { vendor?: Vendor }) {
+function VendorForm({ vendor, onSuccess, onRefresh }: { vendor?: Vendor; onSuccess?: () => void; onRefresh?: () => void }) {
   const form = useForm<VendorTypes.TInsertVendor>({
     resolver: zodResolver(VendorTypes.SInsertVendor),
     defaultValues: vendor ?? {
@@ -52,7 +53,14 @@ function VendorForm({ vendor }: { vendor?: Vendor }) {
   const { mutateAsync: createVendor, isPending } = createVendorMutation();
 
   async function handleSubmit(values: VendorTypes.TInsertVendor) {
-    await createVendor(values);
+    try {
+      await createVendor(values);
+      onSuccess?.();
+      onRefresh?.();
+    } catch (error) {
+      // Error is already handled by the mutation
+      console.error("Error creating vendor:", error);
+    }
   }
 
   return (
@@ -149,6 +157,7 @@ export function VendorDialog({
   vendors,
   setVendors,
   trigger,
+  onRefresh,
 }: VendorDialogProps) {
   const [open, setOpen] = useState(false);
 
@@ -172,7 +181,7 @@ export function VendorDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <VendorForm />
+        <VendorForm vendor={vendor} onSuccess={() => setOpen(false)} onRefresh={onRefresh} />
       </DialogContent>
     </Dialog>
   );

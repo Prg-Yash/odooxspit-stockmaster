@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { User, Mail, Building2, MapPin, Phone, Calendar, Upload, Edit2, Save, X, Lock, Loader2 } from "lucide-react"
+import { User, Mail, Building2, MapPin, Phone, Calendar, Upload, Edit2, Save, X, Lock, Loader2, RefreshCw } from "lucide-react"
 import { updateProfile, getCurrentUser } from "@/lib/api/user"
 import { toast } from "sonner"
+import { refreshUserData } from "@/lib/auth-utils"
 
 export default function AccountPage() {
   const [user, setUser] = useState<any>(null)
@@ -152,6 +153,23 @@ export default function AccountPage() {
     setIsEditingPassword(false)
   }
 
+  const handleRefreshSession = async () => {
+    try {
+      setIsFetchingUser(true)
+      const freshUser = await refreshUserData()
+      setUser(freshUser)
+      setEditedName(freshUser?.name || "")
+      toast.success("Session refreshed successfully")
+    } catch (error: any) {
+      console.error("Error refreshing session:", error)
+      if (error.status !== 401) {
+        toast.error("Failed to refresh session")
+      }
+    } finally {
+      setIsFetchingUser(false)
+    }
+  }
+
   if (isFetchingUser) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -169,9 +187,15 @@ export default function AccountPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Account</h1>
-        <p className="text-muted-foreground">Manage your account information</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Account</h1>
+          <p className="text-muted-foreground">Manage your account information</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={handleRefreshSession} disabled={isFetchingUser}>
+          <RefreshCw className={`h-4 w-4 mr-2 ${isFetchingUser ? 'animate-spin' : ''}`} />
+          Refresh Session
+        </Button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-[300px_1fr]">

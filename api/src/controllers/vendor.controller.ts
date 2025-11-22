@@ -24,12 +24,19 @@ function handlePrismaError(error: any): string {
 
 export const createVendor = async (req: Request, res: Response) => {
   try {
+    console.log("=== CREATE VENDOR BACKEND ===");
+    console.log("req.user:", req.user);
+    console.log("req.user.role:", req.user?.role);
+    console.log("req.body:", req.body);
+
     // Check if user is OWNER or MANAGER
     if (req.user?.role !== "OWNER" && req.user?.role !== "MANAGER") {
+      console.log("❌ Permission denied - User role:", req.user?.role);
       return res
         .status(403)
         .json({ error: "Only OWNER and MANAGER can create vendors" });
     }
+    console.log("✅ Permission granted - User role:", req.user?.role);
     const data = createVendorSchema.parse(req.body);
     const vendor = await vendorService.createVendor(data);
     res.status(201).json(vendor);
@@ -67,8 +74,8 @@ export const getAllVendors = async (req: Request, res: Response) => {
       req.query.isActive === "true"
         ? true
         : req.query.isActive === "false"
-        ? false
-        : undefined;
+          ? false
+          : undefined;
     const vendors = await vendorService.getAllVendors(isActive);
     res.json(vendors);
   } catch (error) {
