@@ -1,23 +1,11 @@
 import * as React from "react"
 import Link from "next/link"
 import {
-  LayoutDashboard,
   Package,
-  Warehouse,
-  TruckIcon,
-  History,
   Settings,
   ChevronDown,
   User2,
   LogOut,
-  Receipt,
-  Users,
-  MapPin,
-  PackagePlus,
-  FolderKanban,
-  Building2,
-  UserCog,
-  type LucideIcon,
 } from "lucide-react"
 import { useRouter, usePathname } from "next/navigation"
 
@@ -45,132 +33,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { MenuItem, MenuSectiontype } from "@/types"
+import { menuSections } from "./sidebar/menu-items"
 
-interface SubMenuItem {
-  title: string
-  url: string
-}
 
-interface MenuItem {
-  title: string
-  url: string
-  icon: LucideIcon
-  subItems?: SubMenuItem[]
-  roles?: ("owner" | "manager" | "employee")[]
-}
-
-interface MenuSection {
-  label: string
-  items: MenuItem[]
-  roles?: ("owner" | "manager" | "employee")[]
-}
-
-const menuSections: MenuSection[] = [
-  {
-    label: "Dashboard",
-    items: [
-      {
-        title: "Overview",
-        url: "/dashboard",
-        icon: LayoutDashboard,
-      },
-    ],
-  },
-  {
-    label: "Management",
-    items: [
-      {
-        title: "Company",
-        url: "/dashboard/company",
-        icon: Building2,
-        roles: ["owner"],
-      },
-      {
-        title: "Employees",
-        url: "/dashboard/employees",
-        icon: UserCog,
-        roles: ["owner", "manager"],
-      },
-      {
-        title: "Account",
-        url: "/dashboard/account",
-        icon: User2,
-      },
-      {
-        title: "Settings",
-        url: "/dashboard/settings",
-        icon: Settings,
-      },
-    ],
-  },
-  {
-    label: "Operations",
-    items: [
-      {
-        title: "Moves",
-        url: "/dashboard/moves",
-        icon: TruckIcon,
-      },
-      {
-        title: "Receipts",
-        url: "/dashboard/receipts",
-        icon: Receipt,
-      },
-    ],
-  },
-  {
-    label: "Stock Management",
-    items: [
-      {
-        title: "Products",
-        url: "/dashboard/products",
-        icon: Package,
-        subItems: [
-          {
-            title: "All Products",
-            url: "/dashboard/products",
-          },
-        ],
-      },
-      {
-        title: "Inventory",
-        url: "/dashboard/inventory",
-        icon: FolderKanban,
-      },
-      {
-        title: "Warehouses",
-        url: "/dashboard/warehouse",
-        icon: Warehouse,
-        roles: ["owner", "manager"],
-      },
-      {
-        title: "Locations",
-        url: "/dashboard/warehouse-locations",
-        icon: MapPin,
-      },
-      {
-        title: "Vendors",
-        url: "/dashboard/vendors",
-        icon: Users,
-        roles: ["owner", "manager"],
-      },
-    ],
-  },
-  {
-    label: "History",
-    items: [
-      {
-        title: "Move History",
-        url: "/dashboard/move-history",
-        icon: History,
-      },
-    ],
-  },
-]
 
 const useActiveRoute = () => {
   const pathname = usePathname()
-
   const isExactMatch = React.useCallback(
     (url: string) => pathname === url,
     [pathname]
@@ -259,7 +128,7 @@ const useAuthHook = () => {
 }
 
 const MenuSection = ({ section, isActive, isExactMatch, shouldExpand, userRole }: {
-  section: MenuSection
+  section: MenuSectiontype
   isActive: (url: string, hasSubItems?: boolean) => boolean
   isExactMatch: (url: string) => boolean
   shouldExpand: (url: string) => boolean
