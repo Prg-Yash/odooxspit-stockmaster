@@ -369,9 +369,13 @@ export class WarehouseService {
      * Create location in warehouse
      */
     async createLocation(warehouseId: string, data: CreateLocationDto) {
+        // Auto-generate code if not provided
+        const code = data.code || `LOC-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+
         return await prisma.location.create({
             data: {
                 ...data,
+                code,
                 warehouseId,
             },
         });

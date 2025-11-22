@@ -107,3 +107,38 @@ export const requireWarehouseAccess = requireWarehouseRole([
 export const requireWarehouseManager = requireWarehouseRole([
     WarehouseMemberRole.MANAGER,
 ]);
+
+/**
+ * Middleware to check if user is a system owner
+ */
+export const requireOwner = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const userId = req.user?.id;
+
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Authentication required",
+            });
+        }
+
+        if (req.user?.role !== "OWNER") {
+            return res.status(403).json({
+                success: false,
+                message: "This action requires OWNER role",
+            });
+        }
+
+        next();
+    } catch (error) {
+        console.error("Owner authorization error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Authorization check failed",
+        });
+    }
+};

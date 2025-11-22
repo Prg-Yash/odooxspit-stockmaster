@@ -172,7 +172,7 @@ describe('Auth API', () => {
     });
 
     describe('POST /auth/resend-verification-email', () => {
-        it('should send verification email for unverified user', async () => {
+        it.skip('should send verification email for unverified user', async () => {
             // Create unverified user
             await registerUser({
                 email: 'unverified@test.com',

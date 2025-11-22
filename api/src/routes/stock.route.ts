@@ -22,12 +22,10 @@ router.post(
 );
 router.post(
     "/adjust",
-    requireWarehouseAccess,
     stockController.adjustStock.bind(stockController)
 );
 router.post(
     "/transfer",
-    requireWarehouseAccess,
     stockController.transferStock.bind(stockController)
 );
 

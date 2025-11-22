@@ -92,7 +92,9 @@ export class ProductService {
         });
 
         if (existing) {
-            throw new Error("Product with this SKU already exists in this warehouse");
+            const error: any = new Error("Product with this SKU already exists in this warehouse");
+            error.code = "DUPLICATE_SKU";
+            throw error;
         }
 
         // Validate category if provided

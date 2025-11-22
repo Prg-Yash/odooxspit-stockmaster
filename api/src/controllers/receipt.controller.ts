@@ -81,10 +81,22 @@ export const updateReceipt = async (req: Request, res: Response) => {
         if (!id) {
             return res.status(400).json({ error: "Receipt ID is required" });
         }
+
+        // Get receipt to check warehouse access
+        const receipt = await receiptService.getReceiptById(id);
+        if (!receipt) {
+            return res.status(404).json({ error: "Receipt not found" });
+        }
+
+        // Check user has manager role
+        if (req.user?.role !== "OWNER" && req.user?.role !== "MANAGER") {
+            return res.status(403).json({ error: "Manager role required" });
+        }
+
         const data = updateReceiptSchema.parse(req.body);
         const userId = req.user!.id;
-        const receipt = await receiptService.updateReceipt(id, data, userId);
-        res.json(receipt);
+        const updatedReceipt = await receiptService.updateReceipt(id, data, userId);
+        res.json(updatedReceipt);
     } catch (error) {
         if (error instanceof ZodError) {
             return res.status(400).json({ error: "Validation error", details: error.issues });
@@ -102,15 +114,27 @@ export const updateReceiptStatus = async (req: Request, res: Response) => {
         if (!id) {
             return res.status(400).json({ error: "Receipt ID is required" });
         }
+
+        // Get receipt to check warehouse access
+        const receipt = await receiptService.getReceiptById(id);
+        if (!receipt) {
+            return res.status(404).json({ error: "Receipt not found" });
+        }
+
+        // Check user has manager role
+        if (req.user?.role !== "OWNER" && req.user?.role !== "MANAGER") {
+            return res.status(403).json({ error: "Manager role required" });
+        }
+
         const data = updateReceiptStatusSchema.parse(req.body);
         const userId = req.user!.id;
-        const receipt = await receiptService.updateReceiptStatus(id, data.status, userId);
-        res.json(receipt);
+        const updatedReceipt = await receiptService.updateReceiptStatus(id, data.status, userId);
+        res.json(updatedReceipt);
     } catch (error) {
         if (error instanceof ZodError) {
             return res.status(400).json({ error: "Validation error", details: error.issues });
         }
-        if (error instanceof Error && (error.message.includes("cannot") || error.message.includes("Invalid"))) {
+        if (error instanceof Error && (error.message.includes("cannot") || error.message.includes("Invalid") || error.message.includes("Can only"))) {
             return res.status(400).json({ error: error.message });
         }
         res.status(500).json({ error: handlePrismaError(error) });
@@ -123,11 +147,26 @@ export const deleteReceipt = async (req: Request, res: Response) => {
         if (!id) {
             return res.status(400).json({ error: "Receipt ID is required" });
         }
+
+        // Get receipt to check warehouse access
+        const receipt = await receiptService.getReceiptById(id);
+        if (!receipt) {
+            return res.status(404).json({ error: "Receipt not found" });
+        }
+
+        // Check user has manager role
+        if (req.user?.role !== "OWNER" && req.user?.role !== "MANAGER") {
+            return res.status(403).json({ error: "Manager role required" });
+        }
+
         await receiptService.deleteReceipt(id);
-        res.status(204).send();
+        res.status(200).json({ message: "Receipt deleted successfully" });
     } catch (error: any) {
-        if (error.message.includes("DRAFT")) {
+        if (error.message && error.message.includes("DRAFT")) {
             return res.status(400).json({ error: error.message });
+        }
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2003") {
+            return res.status(400).json({ error: "Cannot delete receipt with related records" });
         }
         res.status(500).json({ error: handlePrismaError(error) });
     }

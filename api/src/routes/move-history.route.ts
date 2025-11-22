@@ -21,6 +21,6 @@ router.get("/vendor/:vendorId", moveHistoryController.getVendorMovements);
 router.get("/:id", moveHistoryController.getMovementById);
 
 // Update movement status (MANAGER only)
-router.patch("/:id/status", requireWarehouseManager, moveHistoryController.updateMovementStatus);
+router.patch("/:id/status", moveHistoryController.updateMovementStatus);
 
 export default router;

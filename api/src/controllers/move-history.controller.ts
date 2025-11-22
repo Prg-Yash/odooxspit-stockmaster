@@ -72,6 +72,10 @@ export const updateMovementStatus = async (req: Request, res: Response) => {
         if (!id) {
             return res.status(400).json({ error: "Movement ID is required" });
         }
+        // Check if user is OWNER or MANAGER
+        if (req.user?.role !== "OWNER" && req.user?.role !== "MANAGER") {
+            return res.status(403).json({ error: "Only OWNER and MANAGER can update movement status" });
+        }
         const data = updateMovementStatusSchema.parse(req.body);
         const movement = await moveHistoryService.updateMovementStatus(id, data);
         res.json(movement);

@@ -73,7 +73,7 @@ export class WarehouseController {
             return res.status(201).json({
                 success: true,
                 message: "Warehouse created successfully.",
-                data: { warehouse },
+                data: warehouse,
             });
         } catch (error: any) {
             console.error("Create warehouse error:", error);
@@ -161,7 +161,7 @@ export class WarehouseController {
             return res.status(200).json({
                 success: true,
                 message: "Warehouse updated successfully.",
-                data: { warehouse },
+                data: warehouse,
             });
         } catch (error: any) {
             console.error("Update warehouse error:", error);
@@ -216,7 +216,7 @@ export class WarehouseController {
             return res.status(201).json({
                 success: true,
                 message: "Member added successfully.",
-                data: { member },
+                data: member,
             });
         } catch (error: any) {
             console.error("Add member error:", error);
@@ -361,7 +361,7 @@ export class WarehouseController {
             return res.status(201).json({
                 success: true,
                 message: "Location created successfully.",
-                data: { location },
+                data: location,
             });
         } catch (error: any) {
             console.error("Create location error:", error);

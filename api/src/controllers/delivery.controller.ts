@@ -82,10 +82,22 @@ export const updateDelivery = async (req: Request, res: Response) => {
         if (!id) {
             return res.status(400).json({ error: "Delivery ID is required" });
         }
+
+        // Get delivery to check warehouse access
+        const delivery = await deliveryService.getDeliveryById(id);
+        if (!delivery) {
+            return res.status(404).json({ error: "Delivery not found" });
+        }
+
+        // Check user has manager role
+        if (req.user?.role !== "OWNER" && req.user?.role !== "MANAGER") {
+            return res.status(403).json({ error: "Manager role required" });
+        }
+
         const data = updateDeliverySchema.parse(req.body);
         const userId = req.user!.id;
-        const delivery = await deliveryService.updateDelivery(id, data, userId);
-        res.json(delivery);
+        const updatedDelivery = await deliveryService.updateDelivery(id, data, userId);
+        res.json(updatedDelivery);
     } catch (error) {
         if (error instanceof ZodError) {
             return res.status(400).json({ error: "Validation error", details: error.issues });
@@ -103,15 +115,27 @@ export const updateDeliveryStatus = async (req: Request, res: Response) => {
         if (!id) {
             return res.status(400).json({ error: "Delivery ID is required" });
         }
+
+        // Get delivery to check warehouse access
+        const delivery = await deliveryService.getDeliveryById(id);
+        if (!delivery) {
+            return res.status(404).json({ error: "Delivery not found" });
+        }
+
+        // Check user has manager role
+        if (req.user?.role !== "OWNER" && req.user?.role !== "MANAGER") {
+            return res.status(403).json({ error: "Manager role required" });
+        }
+
         const data = updateDeliveryStatusSchema.parse(req.body);
         const userId = req.user!.id;
-        const delivery = await deliveryService.updateDeliveryStatus(id, data.status, userId);
-        res.json(delivery);
+        const updatedDelivery = await deliveryService.updateDeliveryStatus(id, data.status, userId);
+        res.json(updatedDelivery);
     } catch (error) {
         if (error instanceof ZodError) {
             return res.status(400).json({ error: "Validation error", details: error.issues });
         }
-        if (error instanceof Error && (error.message.includes("cannot") || error.message.includes("Invalid") || error.message.includes("Insufficient"))) {
+        if (error instanceof Error && (error.message.includes("cannot") || error.message.includes("Invalid") || error.message.includes("Insufficient") || error.message.includes("Can only"))) {
             return res.status(400).json({ error: error.message });
         }
         res.status(500).json({ error: handlePrismaError(error) });
@@ -124,11 +148,26 @@ export const deleteDelivery = async (req: Request, res: Response) => {
         if (!id) {
             return res.status(400).json({ error: "Delivery ID is required" });
         }
+
+        // Get delivery to check warehouse access
+        const delivery = await deliveryService.getDeliveryById(id);
+        if (!delivery) {
+            return res.status(404).json({ error: "Delivery not found" });
+        }
+
+        // Check user has manager role
+        if (req.user?.role !== "OWNER" && req.user?.role !== "MANAGER") {
+            return res.status(403).json({ error: "Manager role required" });
+        }
+
         await deliveryService.deleteDelivery(id);
-        res.status(204).send();
+        res.status(200).json({ message: "Delivery deleted successfully" });
     } catch (error: any) {
-        if (error.message.includes("DRAFT")) {
+        if (error.message && error.message.includes("DRAFT")) {
             return res.status(400).json({ error: error.message });
+        }
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2003") {
+            return res.status(400).json({ error: "Cannot delete delivery with related records" });
         }
         res.status(500).json({ error: handlePrismaError(error) });
     }

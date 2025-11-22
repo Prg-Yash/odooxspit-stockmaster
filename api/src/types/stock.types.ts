@@ -33,7 +33,9 @@ export const transferStockSchema = z.object({
 export const adjustStockSchema = z.object({
     productId: z.string().min(1, "Product ID is required"),
     locationId: z.string().min(1, "Location ID is required"),
-    newQuantity: z.number().int().min(0, "Quantity cannot be negative"),
+    quantity: z.number().int().optional(),
+    newQuantity: z.number().int().min(0, "Quantity cannot be negative").optional(),
+    reason: z.string().optional(),
     reference: z.string().optional(),
     notes: z.string().optional(),
 });
