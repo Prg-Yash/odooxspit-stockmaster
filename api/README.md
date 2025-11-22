@@ -107,6 +107,106 @@ npm start
 - Warehouse **STAFF** can perform stock operations but cannot modify warehouse settings
 - Users can only access warehouses they are members of (except OWNER)
 
+## Complete User & Warehouse Flow
+
+### 1. Initial Setup (Owner Registration)
+```
+1. Owner registers → POST /auth/register
+   {
+     "email": "owner@company.com",
+     "password": "SecurePass123!",
+     "name": "John Owner",
+     "role": "owner"
+   }
+
+2. Owner receives verification email
+
+3. Owner verifies email → GET /auth/verify-email?token=xxx&email=owner@company.com
+
+4. Owner logs in → POST /auth/login
+   Response includes: accessToken, refreshToken, and user data with role: "OWNER"
+```
+
+### 2. Warehouse Creation (Owner)
+```
+5. Owner creates warehouse → POST /warehouses
+   Authorization: Bearer <owner_access_token>
+   {
+     "name": "Main Warehouse",
+     "code": "WH001",
+     "address": "123 Storage St",
+     "city": "Mumbai",
+     "state": "Maharashtra",
+     "country": "India",
+     "postalCode": "400001"
+   }
+```
+
+### 3. Inviting Users (Owner/Manager)
+```
+6. First, invited users must register:
+   → POST /auth/register
+   {
+     "email": "manager@company.com",
+     "password": "SecurePass123!",
+     "name": "Sarah Manager",
+     "role": "manager"  // or "staff"
+   }
+
+7. They verify their email → GET /auth/verify-email?token=xxx&email=manager@company.com
+
+8. Owner/Manager adds them to warehouse → POST /warehouses/:warehouseId/members
+   {
+     "userId": "user_id_from_step_6",
+     "role": "MANAGER"  // or "STAFF"
+   }
+```
+
+### 4. Member Access Flow
+```
+9. Manager logs in → POST /auth/login
+   {
+     "email": "manager@company.com",
+     "password": "SecurePass123!"
+   }
+
+10. Manager gets their warehouses → GET /warehouses
+    Returns only warehouses they're members of
+
+11. Manager can now:
+    - View warehouse details
+    - Add/remove staff members (if MANAGER role)
+    - Manage products and locations (if MANAGER role)
+    - Perform stock operations (all roles)
+```
+
+### 5. Role-Based Operations
+
+**OWNER (System Role)**:
+- ✅ Access ALL warehouses automatically
+- ✅ Create new warehouses
+- ✅ Delete any warehouse
+- ✅ Add/remove members to any warehouse
+- ✅ Full control over all operations
+
+**MANAGER (Warehouse Role)**:
+- ✅ Access assigned warehouses only
+- ✅ Add/remove warehouse members
+- ✅ Create/edit/delete locations
+- ✅ Create/edit/delete products
+- ✅ All stock operations
+- ❌ Cannot create new warehouses
+- ❌ Cannot delete warehouses
+
+**STAFF (Warehouse Role)**:
+- ✅ Access assigned warehouses only
+- ✅ View warehouse details
+- ✅ View products and locations
+- ✅ Perform stock operations (receive, deliver, adjust, transfer)
+- ❌ Cannot add/remove members
+- ❌ Cannot create/edit locations or products
+- ❌ Cannot delete anything
+
 ## API Endpoints
 
 ### Authentication
@@ -144,10 +244,13 @@ Content-Type: application/json
   "data": {
     "userId": "user_abc123",
     "email": "user@example.com",
-    "name": "John Doe"
+    "name": "John Doe",
+    "role": "STAFF"
   }
 }
 ```
+
+**Note**: A verification email is automatically sent to the registered email address
 
 #### Verify Email
 ```http
@@ -205,6 +308,7 @@ Content-Type: application/json
       "id": "user_abc123",
       "email": "user@example.com",
       "name": "John Doe",
+      "role": "STAFF",
       "emailVerified": true
     }
   }
@@ -476,6 +580,13 @@ Authorization: Bearer <token>
 
 ### Warehouse Members
 
+**Member Invitation Flow**:
+1. System OWNER creates their account with role "owner"
+2. OWNER creates a warehouse
+3. OWNER invites users by adding them as members with specific roles (MANAGER or STAFF)
+4. Members can only access warehouses they're explicitly added to
+5. System OWNER has automatic access to all warehouses
+
 #### Get Members
 ```http
 GET /warehouses/:warehouseId/members
@@ -483,6 +594,31 @@ Authorization: Bearer <token>
 ```
 
 **Permission**: Warehouse member (any role) or OWNER
+
+**Response (200)**:
+```json
+{
+  "success": true,
+  "data": {
+    "members": [
+      {
+        "id": "member_id",
+        "warehouseId": "warehouse_id",
+        "userId": "user_id",
+        "role": "MANAGER",
+        "createdAt": "2025-01-15T10:30:00.000Z",
+        "updatedAt": "2025-01-15T10:30:00.000Z",
+        "user": {
+          "id": "user_id",
+          "email": "manager@example.com",
+          "name": "John Manager",
+          "role": "MANAGER"
+        }
+      }
+    ]
+  }
+}
+```
 
 #### Add Member
 ```http
@@ -496,6 +632,35 @@ Authorization: Bearer <token>
 ```
 
 **Permission**: Warehouse MANAGER or OWNER
+
+**Response (201)**:
+```json
+{
+  "success": true,
+  "message": "Member added successfully.",
+  "data": {
+    "member": {
+      "id": "member_id",
+      "warehouseId": "warehouse_id",
+      "userId": "user_id",
+      "role": "STAFF",
+      "createdAt": "2025-01-20T14:30:00.000Z",
+      "updatedAt": "2025-01-20T14:30:00.000Z",
+      "user": {
+        "id": "user_id",
+        "email": "staff@example.com",
+        "name": "Jane Staff"
+      }
+    }
+  }
+}
+```
+
+**Notes**:
+- User must already be registered in the system
+- User cannot be added twice to the same warehouse
+- MANAGER role allows full warehouse management
+- STAFF role allows only stock operations
 
 #### Update Member Role
 ```http
@@ -850,6 +1015,40 @@ await applyStockChange({
 - **UnitOfMeasure**: PIECE, KG, GRAM, LITER, ML, METER, CM, BOX, PACK
 - **StockMovementType**: RECEIPT, DELIVERY, ADJUSTMENT, TRANSFER_IN, TRANSFER_OUT
 
+## Security Features
+
+### Authentication
+- **JWT Access Tokens** - Short-lived (15 minutes) for API requests
+- **Refresh Token Rotation** - Long-lived tokens (30 days) with automatic rotation
+- **HTTP-Only Cookies** - Refresh tokens stored securely in cookies
+- **Email Verification** - Required before login
+- **Password Requirements**:
+  - Minimum 8 characters
+  - At least one uppercase letter
+  - At least one lowercase letter
+  - At least one number
+  - At least one special character (@$!%*?&_)
+
+### Authorization
+- **Role-Based Access Control (RBAC)** - System-wide user roles
+- **Warehouse-Level Permissions** - Granular access per warehouse
+- **Member Validation** - Users can only access warehouses they belong to
+- **Owner Bypass** - System owners have access to all resources
+
+### Data Protection
+- **Password Hashing** - Bcrypt with salt
+- **Token Signing** - HMAC SHA-256
+- **Cascade Deletes** - Proper cleanup of related data
+- **Transaction Safety** - Stock operations use database transactions
+- **Rate Limiting** - 100 requests/15min general, 20 requests/15min auth
+- **Input Validation** - Zod schema validation on all inputs
+
+### Session Management
+- **Device Tracking** - Track user sessions by device
+- **Session Revocation** - Logout invalidates refresh tokens
+- **Password Change** - Revokes all sessions
+- **Multi-Device Support** - Users can be logged in on multiple devices
+
 ## Error Handling
 
 All endpoints return consistent error responses:
@@ -868,6 +1067,7 @@ Common HTTP status codes:
 - `401` - Unauthorized (not authenticated)
 - `403` - Forbidden (insufficient permissions)
 - `404` - Resource not found
+- `429` - Too many requests (rate limited)
 - `500` - Internal server error
 
 ## Development
@@ -890,6 +1090,103 @@ npx prisma migrate dev --name your_migration_name
 ```bash
 npx prisma studio
 ```
+
+## Quick Reference
+
+### Common Operations
+
+**1. Register as Owner**
+```bash
+POST /auth/register
+{
+  "email": "owner@company.com",
+  "password": "SecurePass123!",
+  "name": "Owner Name",
+  "role": "owner"
+}
+```
+
+**2. Verify Email & Login**
+```bash
+GET /auth/verify-email?token=xxx&email=owner@company.com
+POST /auth/login { "email": "owner@company.com", "password": "SecurePass123!" }
+```
+
+**3. Create Warehouse**
+```bash
+POST /warehouses
+Authorization: Bearer <token>
+{
+  "name": "Main Warehouse",
+  "code": "WH001",
+  "address": "123 St",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "country": "India",
+  "postalCode": "400001"
+}
+```
+
+**4. Add Warehouse Member**
+```bash
+# First, user registers
+POST /auth/register { "email": "staff@company.com", ... }
+
+# Then add to warehouse
+POST /warehouses/:warehouseId/members
+{ "userId": "user_id", "role": "STAFF" }
+```
+
+**5. Create Product**
+```bash
+POST /products/warehouse/:warehouseId
+{
+  "sku": "PROD001",
+  "name": "Product Name",
+  "unitOfMeasure": "PIECE",
+  "reorderLevel": 10
+}
+```
+
+**6. Receive Stock**
+```bash
+POST /stocks/warehouse/:warehouseId/receive
+{
+  "productId": "product_id",
+  "locationId": "location_id",
+  "quantity": 100,
+  "reference": "PO-001"
+}
+```
+
+### Key Endpoints by Role
+
+**Anyone (Unauthenticated)**:
+- POST `/auth/register` - Create account
+- POST `/auth/login` - Login
+- GET `/auth/verify-email` - Verify email
+
+**All Authenticated Users**:
+- GET `/user/me` - Get profile
+- PUT `/user/update` - Update profile
+- POST `/auth/logout` - Logout
+
+**OWNER (System-wide)**:
+- All endpoints without restrictions
+- GET `/warehouses` - See ALL warehouses
+
+**MANAGER (Warehouse-level)**:
+- POST `/warehouses/:id/members` - Add members
+- POST `/warehouses/:id/locations` - Create locations
+- POST `/products/warehouse/:id` - Create products
+- All stock operations
+
+**STAFF (Warehouse-level)**:
+- GET `/warehouses/:id` - View warehouse
+- POST `/stocks/warehouse/:id/receive` - Receive stock
+- POST `/stocks/warehouse/:id/deliver` - Deliver stock
+- POST `/stocks/adjust` - Adjust stock
+- POST `/stocks/transfer` - Transfer stock
 
 ## License
 
