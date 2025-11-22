@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import jwt, { type SignOptions } from "jsonwebtoken";
 import { createHash, randomBytes } from "crypto";
 import type { AuthTypes } from "~/types/auth.types";
+import { generateNumericCode } from "~/utils/crypto";
 
 const JWT_SECRET =
   process.env.JWT_SECRET || "your-super-secret-jwt-key-change-this";
@@ -12,6 +13,8 @@ const REFRESH_TOKEN_EXPIRES_DAYS = parseInt(
   process.env.REFRESH_TOKEN_EXPIRES_DAYS || "30"
 );
 const BCRYPT_ROUNDS = 12;
+const OTP_EXPIRY_MINUTES = parseInt(process.env.OTP_EXPIRY_MINUTES || "10");
+const OTP_MAX_ATTEMPTS = parseInt(process.env.OTP_MAX_ATTEMPTS || "5");
 
 /**
  * Hash a password using bcrypt
@@ -336,6 +339,150 @@ async function markPasswordResetTokenUsed(tokenId: string) {
   });
 }
 
+/**
+ * Generate OTP for password reset
+ */
+async function createPasswordResetOTP(userId: string, email: string) {
+  const otp = generateNumericCode(6); // Generate 6-digit OTP
+  const hashedOTP = await bcrypt.hash(otp, BCRYPT_ROUNDS); // Hash the OTP
+  const expiresAt = new Date();
+  expiresAt.setMinutes(expiresAt.getMinutes() + OTP_EXPIRY_MINUTES);
+
+  // Invalidate any existing unused OTPs for this user
+  await prisma.passwordResetOTP.updateMany({
+    where: {
+      userId,
+      verified: false,
+    },
+    data: {
+      verified: true, // Mark as used to invalidate
+    },
+  });
+
+  await prisma.passwordResetOTP.create({
+    data: {
+      otp: hashedOTP,
+      userId,
+      email,
+      expiresAt,
+    },
+  });
+
+  return otp; // Return plain OTP to send via email
+}
+
+/**
+ * Verify OTP for password reset
+ */
+async function verifyPasswordResetOTP(email: string, otp: string) {
+  // Find the most recent OTP for this email
+  const otpRecord = await prisma.passwordResetOTP.findFirst({
+    where: {
+      email,
+      verified: false,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: { user: true },
+  });
+
+  if (!otpRecord) {
+    return { success: false, message: "No OTP found for this email." };
+  }
+
+  // Check if OTP is expired
+  if (new Date() > otpRecord.expiresAt) {
+    return { success: false, message: "OTP has expired." };
+  }
+
+  // Check if max attempts exceeded
+  if (otpRecord.attempts >= OTP_MAX_ATTEMPTS) {
+    return {
+      success: false,
+      message: "Maximum verification attempts exceeded. Please request a new OTP.",
+    };
+  }
+
+  // Verify OTP
+  const isValid = await bcrypt.compare(otp, otpRecord.otp);
+
+  if (!isValid) {
+    // Increment attempts
+    await prisma.passwordResetOTP.update({
+      where: { id: otpRecord.id },
+      data: { attempts: otpRecord.attempts + 1 },
+    });
+
+    const remainingAttempts = OTP_MAX_ATTEMPTS - (otpRecord.attempts + 1);
+    return {
+      success: false,
+      message: `Invalid OTP. ${remainingAttempts} attempts remaining.`,
+    };
+  }
+
+  // Mark OTP as verified
+  await prisma.passwordResetOTP.update({
+    where: { id: otpRecord.id },
+    data: { verified: true },
+  });
+
+  // Generate a short-lived reset token (15 minutes)
+  const resetToken = generateSecureToken();
+  const hashedToken = hashToken(resetToken);
+  const tokenExpiresAt = new Date();
+  tokenExpiresAt.setMinutes(tokenExpiresAt.getMinutes() + 15);
+
+  await prisma.passwordResetToken.create({
+    data: {
+      token: hashedToken,
+      userId: otpRecord.userId,
+      email,
+      expiresAt: tokenExpiresAt,
+    },
+  });
+
+  return {
+    success: true,
+    message: "OTP verified successfully.",
+    resetToken,
+  };
+}
+
+/**
+ * Check if user can request new OTP (rate limiting)
+ */
+async function canRequestNewOTP(email: string) {
+  const cooldownSeconds = parseInt(
+    process.env.OTP_COOLDOWN_SECONDS || "60"
+  );
+
+  const recentOTP = await prisma.passwordResetOTP.findFirst({
+    where: {
+      email,
+      createdAt: {
+        gte: new Date(Date.now() - cooldownSeconds * 1000),
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  if (recentOTP) {
+    const secondsRemaining = Math.ceil(
+      (recentOTP.createdAt.getTime() + cooldownSeconds * 1000 - Date.now()) /
+        1000
+    );
+    return {
+      canRequest: false,
+      secondsRemaining,
+    };
+  }
+
+  return { canRequest: true, secondsRemaining: 0 };
+}
+
 export {
   hashPassword,
   verifyPassword,
@@ -357,4 +504,7 @@ export {
   createPasswordResetToken,
   verifyPasswordResetToken,
   markPasswordResetTokenUsed,
+  createPasswordResetOTP,
+  verifyPasswordResetOTP,
+  canRequestNewOTP,
 };
