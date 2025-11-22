@@ -1,14 +1,15 @@
+import "dotenv/config";
 import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
 import jwt, { type SignOptions } from "jsonwebtoken";
-import { env } from "~/env";
 import { createHash, randomBytes } from "crypto";
 import type { AuthTypes } from "~/types/auth.types";
 
-const JWT_SECRET = env.JWT_SECRET || "your-super-secret-jwt-key-change-this";
-const JWT_EXPIRES_IN = env.JWT_EXPIRES_IN || "15m";
+const JWT_SECRET =
+  process.env.JWT_SECRET || "your-super-secret-jwt-key-change-this";
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "15m";
 const REFRESH_TOKEN_EXPIRES_DAYS = parseInt(
-  env.REFRESH_TOKEN_EXPIRES_DAYS || "30"
+  process.env.REFRESH_TOKEN_EXPIRES_DAYS || "30"
 );
 const BCRYPT_ROUNDS = 12;
 

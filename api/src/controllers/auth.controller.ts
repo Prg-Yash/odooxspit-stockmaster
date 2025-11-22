@@ -1,3 +1,4 @@
+import "dotenv/config";
 import type { Request, Response } from "express";
 import { UserRole } from "~/generated/prisma/enums";
 import {
@@ -72,7 +73,10 @@ async function register(req: Request, res: Response) {
     });
 
     // Generate email verification token
-    // const verificationToken = await createEmailVerificationToken(user.id, email);
+    const verificationToken = await createEmailVerificationToken(
+      user.id,
+      data.email
+    );
 
     res.status(201).json({
       success: true,
