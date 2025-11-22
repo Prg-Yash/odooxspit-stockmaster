@@ -11,6 +11,7 @@ interface ProductsListPageProps {
 	onViewProduct: (id: string) => void
 	onDeleteProduct: (id: string) => void
 	onRefresh: () => void
+	onCreateProduct: () => void
 }
 
 export function ProductsListPage({
@@ -19,7 +20,8 @@ export function ProductsListPage({
 	onEditProduct,
 	onViewProduct,
 	onDeleteProduct,
-	onRefresh
+	onRefresh,
+	onCreateProduct
 }: ProductsListPageProps) {
 	// Calculate total stock from stockLevels if available
 	const getTotalStock = (product: Product) => {
@@ -43,6 +45,10 @@ export function ProductsListPage({
 						<RefreshCw className="h-4 w-4 mr-2" />
 						Refresh
 					</Button>
+					<Button size="sm" onClick={onCreateProduct}>
+						<Package className="h-4 w-4 mr-2" />
+						Add Product
+					</Button>
 				</div>
 			</div>
 
@@ -53,6 +59,10 @@ export function ProductsListPage({
 					<p className="text-sm text-muted-foreground mb-4">
 						Get started by creating your first product
 					</p>
+					<Button onClick={onCreateProduct}>
+						<Package className="h-4 w-4 mr-2" />
+						Create Product
+					</Button>
 				</div>
 			) : (
 				<div className="overflow-x-auto border rounded-lg">
@@ -76,13 +86,16 @@ export function ProductsListPage({
 								return (
 									<tr key={product.id} className="border-b hover:bg-secondary/30 transition-colors">
 										<td className="p-3">
-											<div>
-												<div className="font-medium">{product.name}</div>
-												{product.description && (
-													<div className="text-xs text-muted-foreground line-clamp-1">
-														{product.description}
-													</div>
-												)}
+											<div className="flex items-center gap-2">
+												<div className={`w-2 h-2 rounded-full ${product.isActive ? 'bg-green-500' : 'bg-red-500'}`} />
+												<div>
+													<div className="font-medium">{product.name}</div>
+													{product.description && (
+														<div className="text-xs text-muted-foreground line-clamp-1">
+															{product.description}
+														</div>
+													)}
+												</div>
 											</div>
 										</td>
 										<td className="p-3">

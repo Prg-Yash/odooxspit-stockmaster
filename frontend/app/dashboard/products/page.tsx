@@ -39,7 +39,7 @@ export default function ProductsPage() {
 
         // Fetch products for this warehouse
         const productsResponse = await getProducts(warehouse.id, {
-          includeInactive: false
+          includeInactive: true
         })
 
         if (productsResponse.success && productsResponse.data) {
@@ -115,6 +115,16 @@ export default function ProductsPage() {
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
+        {error && !error.includes("Authentication") && (
+          <div className="flex justify-end">
+            <button
+              onClick={() => router.push("/dashboard/products/create")}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+            >
+              Add Product
+            </button>
+          </div>
+        )}
       </div>
     )
   }
@@ -127,6 +137,7 @@ export default function ProductsPage() {
       onViewProduct={(id) => router.push(`/dashboard/products/view/${id}`)}
       onDeleteProduct={handleDeleteProduct}
       onRefresh={() => setRefreshKey(prev => prev + 1)}
+      onCreateProduct={() => router.push("/dashboard/products/create")}
     />
   )
 }
