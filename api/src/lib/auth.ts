@@ -1,0 +1,493 @@
+import "dotenv/config";
+import { prisma } from "./prisma";
+import bcrypt from "bcryptjs";
+import jwt, { type SignOptions } from "jsonwebtoken";
+import { createHash, randomBytes } from "crypto";
+import type { AuthTypes } from "~/types/auth.types";
+
+const JWT_SECRET =
+  process.env.JWT_SECRET || "your-super-secret-jwt-key-change-this";
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "15m";
+const REFRESH_TOKEN_EXPIRES_DAYS = parseInt(
+  process.env.REFRESH_TOKEN_EXPIRES_DAYS || "30"
+);
+const BCRYPT_ROUNDS = 12;
+
+/**
+ * Hash a password using bcrypt
+ */
+async function hashPassword(password: string) {
+  return await bcrypt.hash(password, BCRYPT_ROUNDS);
+}
+
+/**
+ * Verify password against hash
+ */
+async function verifyPassword(password: string, hash: string) {
+  return await bcrypt.compare(password, hash);
+}
+
+/**
+ * Generate JWT access token
+ */
+function generateAccessToken(userId: string, email: string) {
+  return jwt.sign({ userId, email }, JWT_SECRET, {
+    expiresIn: "15m",
+  } as SignOptions);
+}
+
+/**
+ * Verify JWT access token
+ */
+function verifyAccessToken(token: string) {
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
+ * Generate a secure random token
+ */
+function generateSecureToken() {
+  return randomBytes(32).toString("hex");
+}
+
+/**
+ * Hash a token for storage
+ */
+function hashToken(token: string) {
+  return createHash("sha256").update(token).digest("hex");
+}
+
+/**
+ * Create and store a refresh token with session metadata
+ */
+async function createRefreshToken(
+  userId: string,
+  sessionMetadata: AuthTypes.SessionMetadata
+) {
+  const token = generateSecureToken();
+  const hashedToken = hashToken(token);
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + REFRESH_TOKEN_EXPIRES_DAYS);
+
+  await prisma.refreshToken.create({
+    data: {
+      token: hashedToken,
+      userId,
+      expiresAt,
+      ipAddress: sessionMetadata.ipAddress || null,
+      userAgent: sessionMetadata.userAgent || null,
+      deviceName: sessionMetadata.deviceName || null,
+      deviceType: sessionMetadata.deviceType || null,
+      browser: sessionMetadata.browser || null,
+      os: sessionMetadata.os || null,
+    },
+  });
+
+  return token;
+}
+
+/**
+ * Verify and retrieve refresh token from database
+ */
+async function verifyRefreshToken(token: string) {
+  const hashedToken = hashToken(token);
+
+  const refreshToken = await prisma.refreshToken.findUnique({
+    where: { token: hashedToken },
+    include: { user: true },
+  });
+
+  if (!refreshToken) {
+    return null;
+  }
+
+  // Check if token is expired
+  if (new Date() > refreshToken.expiresAt) {
+    return null;
+  }
+
+  // Check if token is revoked
+  if (refreshToken.revoked) {
+    return null;
+  }
+
+  return refreshToken;
+}
+
+/**
+ * Revoke a refresh token
+ */
+async function revokeRefreshToken(token: string) {
+  const hashedToken = hashToken(token);
+
+  await prisma.refreshToken.updateMany({
+    where: { token: hashedToken },
+    data: { revoked: true },
+  });
+}
+
+/**
+ * Revoke all refresh tokens for a user
+ */
+async function revokeAllUserRefreshTokens(userId: string) {
+  await prisma.refreshToken.updateMany({
+    where: { userId },
+    data: { revoked: true },
+  });
+}
+
+/**
+ * Update last used timestamp for a refresh token
+ */
+async function updateRefreshTokenLastUsed(token: string) {
+  const hashedToken = hashToken(token);
+
+  await prisma.refreshToken.updateMany({
+    where: { token: hashedToken },
+    data: { lastUsedAt: new Date() },
+  });
+}
+
+/**
+ * Get all active sessions for a user
+ */
+async function getUserActiveSessions(userId: string) {
+  return await prisma.refreshToken.findMany({
+    where: {
+      userId,
+      revoked: false,
+      expiresAt: {
+        gt: new Date(),
+      },
+    },
+    select: {
+      id: true,
+      createdAt: true,
+      lastUsedAt: true,
+      expiresAt: true,
+      ipAddress: true,
+      deviceName: true,
+      deviceType: true,
+      browser: true,
+      os: true,
+    },
+    orderBy: {
+      lastUsedAt: "desc",
+    },
+  });
+}
+
+/**
+ * Revoke a specific session by ID
+ */
+async function revokeSessionById(sessionId: string, userId: string) {
+  const result = await prisma.refreshToken.updateMany({
+    where: {
+      id: sessionId,
+      userId,
+    },
+    data: { revoked: true },
+  });
+
+  return result.count > 0;
+}
+
+/**
+ * Get current session from refresh token
+ */
+async function getCurrentSession(token: string) {
+  const hashedToken = hashToken(token);
+
+  return await prisma.refreshToken.findUnique({
+    where: { token: hashedToken },
+    select: {
+      id: true,
+      userId: true,
+      createdAt: true,
+      lastUsedAt: true,
+      expiresAt: true,
+      ipAddress: true,
+      deviceName: true,
+      deviceType: true,
+      browser: true,
+      os: true,
+      revoked: true,
+    },
+  });
+}
+
+/**
+ * Create email verification token
+ */
+async function createEmailVerificationToken(userId: string, email: string) {
+  const token = generateSecureToken();
+  const hashedToken = hashToken(token);
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 24); // 24 hours
+
+  await prisma.emailVerificationToken.create({
+    data: {
+      token: hashedToken,
+      userId,
+      email,
+      expiresAt,
+    },
+  });
+
+  return token;
+}
+
+/**
+ * Verify email verification token
+ */
+async function verifyEmailVerificationToken(token: string, email: string) {
+  const hashedToken = hashToken(token);
+  const verificationToken = await prisma.emailVerificationToken.findFirst({
+    where: {
+      token: hashedToken,
+      email,
+      used: false,
+    },
+    include: { user: true },
+  });
+
+  if (!verificationToken) {
+    return null;
+  }
+
+  // Check if token is expired
+  if (new Date() > verificationToken.expiresAt) {
+    return null;
+  }
+
+  return verificationToken;
+}
+
+/**
+ * Mark email verification token as used
+ */
+async function markEmailVerificationTokenUsed(tokenId: string) {
+  await prisma.emailVerificationToken.update({
+    where: { id: tokenId },
+    data: { used: true },
+  });
+}
+
+/**
+ * Create password reset token
+ */
+async function createPasswordResetToken(userId: string, email: string) {
+  const token = generateSecureToken();
+  const hashedToken = hashToken(token);
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 1); // 1 hour
+
+  await prisma.passwordResetToken.create({
+    data: {
+      token: hashedToken,
+      userId,
+      email,
+      expiresAt,
+    },
+  });
+
+  return token;
+}
+
+/**
+ * Verify password reset token
+ */
+async function verifyPasswordResetToken(token: string, email: string) {
+  const hashedToken = hashToken(token);
+
+  const resetToken = await prisma.passwordResetToken.findFirst({
+    where: {
+      token: hashedToken,
+      email,
+      used: false,
+    },
+    include: { user: true },
+  });
+
+  if (!resetToken) {
+    return null;
+  }
+
+  // Check if token is expired
+  if (new Date() > resetToken.expiresAt) {
+    return null;
+  }
+
+  return resetToken;
+}
+
+/**
+ * Mark password reset token as used
+ */
+async function markPasswordResetTokenUsed(tokenId: string) {
+  await prisma.passwordResetToken.update({
+    where: { id: tokenId },
+    data: { used: true },
+  });
+}
+
+/**
+ * Generate a random 6-digit OTP
+ */
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+/**
+ * Create password reset OTP
+ */
+async function createPasswordResetOTP(userId: string, email: string) {
+  const otp = generateOTP();
+  const hashedOTP = hashToken(otp);
+  const expiresAt = new Date();
+  expiresAt.setMinutes(expiresAt.getMinutes() + 10); // 10 minutes
+
+  // Invalidate all previous OTPs for this user/email
+  await prisma.passwordResetOTP.deleteMany({
+    where: {
+      userId,
+      email,
+    },
+  });
+
+  await prisma.passwordResetOTP.create({
+    data: {
+      otp: hashedOTP,
+      userId,
+      email,
+      expiresAt,
+    },
+  });
+
+  return otp; // Return plain OTP to send via email
+}
+
+/**
+ * Verify password reset OTP
+ */
+async function verifyPasswordResetOTP(email: string, otp: string) {
+  const hashedOTP = hashToken(otp);
+
+  const otpRecord = await prisma.passwordResetOTP.findFirst({
+    where: {
+      email,
+      verified: false,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: { user: true },
+  });
+
+  if (!otpRecord) {
+    return { success: false, message: "Invalid OTP." };
+  }
+
+  // Check if OTP is expired
+  if (new Date() > otpRecord.expiresAt) {
+    return { success: false, message: "OTP has expired." };
+  }
+
+  // Check max attempts (5 attempts)
+  if (otpRecord.attempts >= 5) {
+    return {
+      success: false,
+      message: "Maximum attempts exceeded. Please request a new OTP.",
+    };
+  }
+
+  // Verify OTP
+  if (otpRecord.otp !== hashedOTP) {
+    // Increment attempts
+    await prisma.passwordResetOTP.update({
+      where: { id: otpRecord.id },
+      data: { attempts: otpRecord.attempts + 1 },
+    });
+    return {
+      success: false,
+      message: `Invalid OTP. ${4 - otpRecord.attempts} attempts remaining.`,
+    };
+  }
+
+  // Mark as verified
+  await prisma.passwordResetOTP.update({
+    where: { id: otpRecord.id },
+    data: { verified: true },
+  });
+
+  return { success: true, otpRecord };
+}
+
+/**
+ * Check if OTP is verified for password reset
+ */
+async function isOTPVerified(email: string) {
+  const otpRecord = await prisma.passwordResetOTP.findFirst({
+    where: {
+      email,
+      verified: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  if (!otpRecord) {
+    return false;
+  }
+
+  // Check if still within valid time (15 minutes after verification)
+  const validUntil = new Date(otpRecord.expiresAt);
+  validUntil.setMinutes(validUntil.getMinutes() + 15);
+
+  if (new Date() > validUntil) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Invalidate OTP after password reset
+ */
+async function invalidatePasswordResetOTP(email: string) {
+  await prisma.passwordResetOTP.deleteMany({
+    where: { email },
+  });
+}
+
+export {
+  hashPassword,
+  verifyPassword,
+  generateAccessToken,
+  verifyAccessToken,
+  generateSecureToken,
+  hashToken,
+  createRefreshToken,
+  verifyRefreshToken,
+  revokeRefreshToken,
+  revokeAllUserRefreshTokens,
+  updateRefreshTokenLastUsed,
+  getUserActiveSessions,
+  revokeSessionById,
+  getCurrentSession,
+  createEmailVerificationToken,
+  verifyEmailVerificationToken,
+  markEmailVerificationTokenUsed,
+  createPasswordResetToken,
+  verifyPasswordResetToken,
+  markPasswordResetTokenUsed,
+  createPasswordResetOTP,
+  verifyPasswordResetOTP,
+  isOTPVerified,
+  invalidatePasswordResetOTP,
+};

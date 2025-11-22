@@ -1,10 +1,19 @@
-import { env } from "./env";
-
+import "dotenv/config";
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
+import { authRouter } from "./routes/auth.route";
+import { initializeMailer } from "./lib/mailer";
+import { userRouter } from "./routes/user.route";
+import { warehouseRouter } from "./routes/warehouse.route";
+import { productRouter } from "./routes/product.route";
+import { stockRouter } from "./routes/stock.route";
+import vendorRouter from "./routes/vendor.route";
+import receiptRouter from "./routes/receipt.route";
+import deliveryRouter from "./routes/delivery.route";
+import moveHistoryRouter from "./routes/move-history.route";
 
 const app = express();
 
@@ -18,6 +27,8 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+initializeMailer();
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -50,6 +61,15 @@ app.get("/health", (req, res) => {
 });
 
 // routes
+app.use("/auth", authRouter);
+app.use("/user", userRouter);
+app.use("/warehouses", warehouseRouter);
+app.use("/products", productRouter);
+app.use("/stocks", stockRouter);
+app.use("/vendors", vendorRouter);
+app.use("/receipts", receiptRouter);
+app.use("/deliveries", deliveryRouter);
+app.use("/moves", moveHistoryRouter);
 
 // 404 handler
 app.use((req, res) => {
@@ -76,8 +96,9 @@ app.use(
 );
 
 // Start server
-app.listen(env.PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${env.PORT}`);
+const PORT = parseInt(process.env.PORT || "4000");
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on http://localhost:${PORT}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || "development"}`);
   console.log(`📧 SMTP configured: ${process.env.SMTP_USER ? "Yes" : "No"}`);
 });
