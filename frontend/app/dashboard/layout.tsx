@@ -7,6 +7,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { Separator } from "@/components/ui/separator"
 import { PageTransition } from "@/components/page-transition"
 import { Loader2 } from "lucide-react"
+import {Navbar} from "@/components/navbar"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -34,8 +35,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!user) {
     return null
   }
-
+  let navbarmode = process.env.NEXT_PUBLIC_NAVBAR_MODE || "sidebar"
   return (
+    <>
+    {navbarmode === "sidebar" && (
     <SidebarProvider defaultOpen>
       <div className="flex w-full max-w-screen min-h-screen overflow-x-hidden">
         <AppSidebar />
@@ -55,5 +58,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </SidebarInset>
       </div>
     </SidebarProvider>
+    )}
+    {navbarmode !== "sidebar" && (
+      <>
+      <Navbar />
+      <div className="w-full min-h-screen p-4 md:p-6 lg:p-8">
+        {/* Only wrap the page content, not the whole container, to avoid overflow/z-index issues */}
+        <div>
+          <PageTransition>{children}</PageTransition>
+        </div>
+      </div>
+    </>
+    )}
+    </>
   )
 }
