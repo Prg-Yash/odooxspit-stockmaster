@@ -4,11 +4,12 @@ import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
+import { authRouter } from "./routes/auth.route";
+import { initializeMailer } from "./lib/mailer";
 import { userRouter } from "./routes/user.route";
 import { warehouseRouter } from "./routes/warehouse.route";
 import { productRouter } from "./routes/product.route";
 import { stockRouter } from "./routes/stock.route";
-import { initializeMailer } from "./lib/mailer";
 
 const app = express();
 
@@ -56,7 +57,8 @@ app.get("/health", (req, res) => {
 });
 
 // routes
-app.use("/auth", userRouter);
+app.use("/auth", authRouter);
+app.use("/user", userRouter);
 app.use("/warehouses", warehouseRouter);
 app.use("/products", productRouter);
 app.use("/stocks", stockRouter);
