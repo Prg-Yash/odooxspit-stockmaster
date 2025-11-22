@@ -175,6 +175,15 @@ See [`AUTHENTICATION_FIX.md`](./AUTHENTICATION_FIX.md) for full details and trou
 
 ---
 
+## 🧑‍💻 Development & Debugging
+
+- **Auth Debug**: Visit `/auth-debug` to view cookies, localStorage, and test API
+- **Clear Session**: Use browser devtools to clear cookies/localStorage before login
+- **CORS**: Backend CORS is set for local dev; ensure both servers run on correct ports
+- **Token Refresh**: Access tokens expire in 15 min; refresh logic endpoint available
+
+---
+
 ## 📚 Documentation
 
 - [Authentication Fix & Flow](./AUTHENTICATION_FIX.md)
@@ -219,29 +228,5 @@ MIT
 For support or questions, open an issue or contact the maintainer.
 
 
-## 🧑‍💻 Development & Debugging
 
-- **Auth Debug**: Visit `/auth-debug` to view cookies, localStorage, and test API
-- **Clear Session**: Use browser devtools to clear cookies/localStorage before login
-- **CORS**: Backend CORS is set for local dev; ensure both servers run on correct ports
-- **Token Refresh**: Access tokens expire in 15 min; refresh logic endpoint available
 
----
-
-## 📝 Roadmap
-
-- [ ] Token refresh logic in frontend
-- [ ] Enhanced error handling and UI feedback
-- [ ] CSRF protection and secure cookies for production
-- [ ] More granular roles and permissions
-- [ ] Mobile-first improvements
-
----
-
-## 📚 Documentation
-
-- [Authentication Fix & Flow](./AUTHENTICATION_FIX.md)
-- [Onboarding Integration](./ONBOARDING_INTEGRATION.md)
-- [Manager Workflow](./MANAGER_WORKFLOW.md)
-
----
