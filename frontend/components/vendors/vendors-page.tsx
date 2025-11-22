@@ -12,9 +12,10 @@ import { VendorDialog } from "@/components/dialogs/vendor-dialog"
 interface VendorsPageProps {
   vendors: Vendor[]
   setVendors: (vendors: Vendor[]) => void
+  onRefresh?: () => void
 }
 
-export function VendorsPage({ vendors, setVendors }: VendorsPageProps) {
+export function VendorsPage({ vendors, setVendors, onRefresh }: VendorsPageProps) {
   const [searchQuery, setSearchQuery] = useState("")
 
   const handleDeleteVendor = (id: string) => {
@@ -40,7 +41,9 @@ export function VendorsPage({ vendors, setVendors }: VendorsPageProps) {
             className="pl-10 border-2"
           />
         </div>
-        <VendorDialog vendors={vendors} setVendors={setVendors} />
+        <div className="flex gap-2">
+          <VendorDialog vendors={vendors} setVendors={setVendors} onRefresh={onRefresh} />
+        </div>
       </div>
       {/* Vendors Grid/List */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -54,6 +57,7 @@ export function VendorsPage({ vendors, setVendors }: VendorsPageProps) {
                     vendor={vendor}
                     vendors={vendors}
                     setVendors={setVendors}
+                    onRefresh={onRefresh}
                     trigger={
                       <button className="p-1 hover:bg-primary/10 rounded transition-colors">
                         <Edit2 size={16} className="text-primary" />

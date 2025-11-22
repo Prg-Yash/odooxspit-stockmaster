@@ -1,23 +1,11 @@
 import * as React from "react"
 import Link from "next/link"
 import {
-  LayoutDashboard,
   Package,
-  Warehouse,
-  TruckIcon,
-  History,
   Settings,
   ChevronDown,
   User2,
   LogOut,
-  Receipt,
-  Users,
-  MapPin,
-  PackagePlus,
-  FolderKanban,
-  Building2,
-  UserCog,
-  type LucideIcon,
 } from "lucide-react"
 import { useRouter, usePathname } from "next/navigation"
 
@@ -45,132 +33,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { MenuItem, MenuSectiontype } from "@/types"
+import { menuSections } from "./sidebar/menu-items"
 
-interface SubMenuItem {
-  title: string
-  url: string
-}
 
-interface MenuItem {
-  title: string
-  url: string
-  icon: LucideIcon
-  subItems?: SubMenuItem[]
-  roles?: ("owner" | "manager" | "employee")[]
-}
-
-interface MenuSection {
-  label: string
-  items: MenuItem[]
-  roles?: ("owner" | "manager" | "employee")[]
-}
-
-const menuSections: MenuSection[] = [
-  {
-    label: "Dashboard",
-    items: [
-      {
-        title: "Overview",
-        url: "/dashboard",
-        icon: LayoutDashboard,
-      },
-    ],
-  },
-  {
-    label: "Management",
-    items: [
-      {
-        title: "Company",
-        url: "/dashboard/company",
-        icon: Building2,
-        roles: ["owner"],
-      },
-      {
-        title: "Employees",
-        url: "/dashboard/employees",
-        icon: UserCog,
-        roles: ["owner", "manager"],
-      },
-      {
-        title: "Account",
-        url: "/dashboard/account",
-        icon: User2,
-      },
-      {
-        title: "Settings",
-        url: "/dashboard/settings",
-        icon: Settings,
-      },
-    ],
-  },
-  {
-    label: "Operations",
-    items: [
-      {
-        title: "Moves",
-        url: "/dashboard/moves",
-        icon: TruckIcon,
-      },
-      {
-        title: "Receipts",
-        url: "/dashboard/receipts",
-        icon: Receipt,
-      },
-    ],
-  },
-  {
-    label: "Stock Management",
-    items: [
-      {
-        title: "Products",
-        url: "/dashboard/products",
-        icon: Package,
-        subItems: [
-          {
-            title: "All Products",
-            url: "/dashboard/products",
-          },
-        ],
-      },
-      {
-        title: "Inventory",
-        url: "/dashboard/inventory",
-        icon: FolderKanban,
-      },
-      {
-        title: "Warehouses",
-        url: "/dashboard/warehouse",
-        icon: Warehouse,
-        roles: ["owner", "manager"],
-      },
-      {
-        title: "Locations",
-        url: "/dashboard/warehouse-locations",
-        icon: MapPin,
-      },
-      {
-        title: "Vendors",
-        url: "/dashboard/vendors",
-        icon: Users,
-        roles: ["owner", "manager"],
-      },
-    ],
-  },
-  {
-    label: "History",
-    items: [
-      {
-        title: "Move History",
-        url: "/dashboard/move-history",
-        icon: History,
-      },
-    ],
-  },
-]
 
 const useActiveRoute = () => {
   const pathname = usePathname()
-
   const isExactMatch = React.useCallback(
     (url: string) => pathname === url,
     [pathname]
@@ -249,17 +118,34 @@ const RegularMenuItem = ({ item, isActive }: {
 )
 
 const useAuthHook = () => {
-  // Mock auth hook, no real auth
-  const user = { name: "Demo User", email: "demo@example.com", role: "owner" as const }
+  const router = useRouter()
+  const [user, setUser] = React.useState<any>(null)
+
+  React.useEffect(() => {
+    const userData = localStorage.getItem("user")
+    if (userData) {
+      setUser(JSON.parse(userData))
+    }
+  }, [])
+
   const logout = () => {
-    console.log("Mock logout")
+    // Clear localStorage
+    localStorage.removeItem("user")
+    localStorage.removeItem("devAccessToken")
+
+    // Clear cookies by setting them to expire
+    document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+    document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+
+    // Redirect to login
+    router.push("/login")
   }
 
   return { user, logout }
 }
 
 const MenuSection = ({ section, isActive, isExactMatch, shouldExpand, userRole }: {
-  section: MenuSection
+  section: MenuSectiontype
   isActive: (url: string, hasSubItems?: boolean) => boolean
   isExactMatch: (url: string) => boolean
   shouldExpand: (url: string) => boolean
@@ -269,7 +155,9 @@ const MenuSection = ({ section, isActive, isExactMatch, shouldExpand, userRole }
   const filteredItems = section.items.filter(item => {
     if (!item.roles) return true // No role restriction
     if (!userRole) return false // No user role, hide restricted items
-    return item.roles.includes(userRole)
+    // Normalize role to lowercase for comparison (backend sends OWNER/MANAGER/STAFF)
+    const normalizedRole = userRole.toLowerCase() as "owner" | "manager" | "employee"
+    return item.roles.includes(normalizedRole)
   })
 
   // Don't render section if all items are filtered out
@@ -310,9 +198,9 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild tooltip="StockMaster" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
               <Link href="/dashboard">
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <Package className="w-6 h-6" />
-              </div>
+                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                  <Package className="w-6 h-6" />
+                </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">StockMaster</span>
                   <span className="truncate text-xs">Inventory System</span>
@@ -331,7 +219,7 @@ export function AppSidebar() {
             isActive={isActiveRoute}
             isExactMatch={isExactMatch}
             shouldExpand={shouldExpandCollapsible}
-            userRole={user?.role}
+            userRole={user?.role?.toLowerCase()}
           />
         ))}
       </SidebarContent>
@@ -341,27 +229,27 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton
-                    size="lg"
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                    tooltip={{
-                      children: user?.name || user?.email || "User",
-                      hidden: false,
-                    }}
-                  >
-                    <div className="flex items-center justify-center">
-                      <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarFallback className="rounded-lg">
-                          {user?.name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                    </div>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">{user?.name || user?.email || "User"}</span>
-                      <span className="truncate text-xs capitalize">{user?.role || "employee"}</span>
-                    </div>
-                    <ChevronDown className="ml-auto size-4" />
-                  </SidebarMenuButton>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                  tooltip={{
+                    children: user?.name || user?.email || "User",
+                    hidden: false,
+                  }}
+                >
+                  <div className="flex items-center justify-center">
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarFallback className="rounded-lg">
+                        {user?.name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">{user?.name || user?.email || "User"}</span>
+                    <span className="truncate text-xs capitalize">{user?.role?.toLowerCase() || "staff"}</span>
+                  </div>
+                  <ChevronDown className="ml-auto size-4" />
+                </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"

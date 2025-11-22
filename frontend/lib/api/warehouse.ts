@@ -70,7 +70,7 @@ export async function createWarehouse(data: CreateWarehouseData) {
  * Get all warehouses for the current user
  */
 export async function getWarehouses() {
-  return api.get<ApiResponse<{ warehouses: Warehouse[] }>>(
+  return api.get<ApiResponse<Warehouse[]>>(
     '/warehouses'
   );
 }
