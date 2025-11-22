@@ -16,3 +16,37 @@ export const UserRole = {
 } as const
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+
+export const WarehouseMemberRole = {
+  MANAGER: 'MANAGER',
+  STAFF: 'STAFF'
+} as const
+
+export type WarehouseMemberRole = (typeof WarehouseMemberRole)[keyof typeof WarehouseMemberRole]
+
+
+export const UnitOfMeasure = {
+  PIECE: 'PIECE',
+  KG: 'KG',
+  GRAM: 'GRAM',
+  LITER: 'LITER',
+  ML: 'ML',
+  METER: 'METER',
+  CM: 'CM',
+  BOX: 'BOX',
+  PACK: 'PACK'
+} as const
+
+export type UnitOfMeasure = (typeof UnitOfMeasure)[keyof typeof UnitOfMeasure]
+
+
+export const StockMovementType = {
+  RECEIPT: 'RECEIPT',
+  DELIVERY: 'DELIVERY',
+  ADJUSTMENT: 'ADJUSTMENT',
+  TRANSFER_IN: 'TRANSFER_IN',
+  TRANSFER_OUT: 'TRANSFER_OUT'
+} as const
+
+export type StockMovementType = (typeof StockMovementType)[keyof typeof StockMovementType]

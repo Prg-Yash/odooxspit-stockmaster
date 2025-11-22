@@ -42,3 +42,38 @@ export type PasswordResetToken = Prisma.PasswordResetTokenModel
  * 
  */
 export type PasswordResetOTP = Prisma.PasswordResetOTPModel
+/**
+ * Model Warehouse
+ * 
+ */
+export type Warehouse = Prisma.WarehouseModel
+/**
+ * Model WarehouseMember
+ * 
+ */
+export type WarehouseMember = Prisma.WarehouseMemberModel
+/**
+ * Model Location
+ * 
+ */
+export type Location = Prisma.LocationModel
+/**
+ * Model ProductCategory
+ * 
+ */
+export type ProductCategory = Prisma.ProductCategoryModel
+/**
+ * Model Product
+ * 
+ */
+export type Product = Prisma.ProductModel
+/**
+ * Model StockLevel
+ * 
+ */
+export type StockLevel = Prisma.StockLevelModel
+/**
+ * Model StockMovement
+ * 
+ */
+export type StockMovement = Prisma.StockMovementModel

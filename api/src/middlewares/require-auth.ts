@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "~/lib/auth";
 import { prisma } from "~/lib/prisma";
+import type { AuthTypes } from "~/types/auth.types";
 
 async function requireAuth(req: Request, res: Response, next: NextFunction) {
   try {
@@ -16,20 +17,23 @@ async function requireAuth(req: Request, res: Response, next: NextFunction) {
     const token = authHeader.slice(7);
     const decoded = verifyAccessToken(token);
 
-    if (!decoded) {
+    if (!decoded || typeof decoded === "string") {
       return res.status(401).json({
         success: false,
         message: "Invalid or expired access token.",
       });
     }
 
+    const payload = decoded as AuthTypes.JwtPayload;
+
     const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
+      where: { id: payload.userId },
       select: {
         id: true,
         email: true,
         name: true,
         emailVerified: true,
+        role: true,
         createdAt: true,
         updatedAt: true,
       },

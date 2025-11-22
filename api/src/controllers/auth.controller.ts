@@ -45,22 +45,28 @@ const COOKIE_OPTIONS = {
 
 async function register(req: Request, res: Response) {
   try {
-    const { success, data } = AuthTypes.SRegister.safeParse(req.body);
+    const result = AuthTypes.SRegister.safeParse(req.body);
 
-    if (!success)
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid or missing data." });
+    if (!result.success) {
+      const errors = result.error.issues.map(e => e.message).join(", ");
+      return res.status(400).json({
+        success: false,
+        message: errors || "Validation failed."
+      });
+    }
+
+    const data = result.data;
 
     const existingUser = await prisma.user.findUnique({
       where: { email: data.email },
     });
 
-    if (existingUser)
+    if (existingUser) {
       return res.status(400).json({
         success: false,
         message: "User with this email already exists.",
       });
+    }
 
     const hashedPassword = await hashPassword(data.password);
 
@@ -85,7 +91,6 @@ async function register(req: Request, res: Response) {
     );
 
     // Send verification email
-    console.log(`📧 Sending verification email to: ${data.email}`);
     await sendVerificationEmail(data.email, verificationToken);
 
     res.status(201).json({
@@ -96,6 +101,7 @@ async function register(req: Request, res: Response) {
         userId: user.id,
         email: user.email,
         name: user.name,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -211,7 +217,7 @@ async function login(req: Request, res: Response) {
     const accessToken = generateAccessToken(user.id, user.email);
 
     // Extract session metadata
-    const userAgent = (req.headers["x-forwarded-for"] as string) || "";
+    const userAgent = req.headers["user-agent"] || "";
     const ipAddress = getClientIp(req);
     const deviceInfo = parseUserAgent(userAgent);
     const deviceName = generateDeviceName(
@@ -243,6 +249,7 @@ async function login(req: Request, res: Response) {
           id: user.id,
           email: user.email,
           name: user.name,
+          role: user.role,
           emailVerified: user.emailVerified,
         },
       },
