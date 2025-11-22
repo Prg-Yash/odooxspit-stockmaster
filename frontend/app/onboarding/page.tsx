@@ -23,13 +23,13 @@ import {
   Boxes,
   MapPin,
   Mail,
-  User,
+  Search,
 } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { createWarehouse, addWarehouseMember } from "@/lib/api/warehouse";
 import { APIError } from "@/lib/api-client";
-import { DevLogin } from "@/components/dev-login";
+import { searchUsers, type User as ApiUser } from "@/lib/api/user";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -54,6 +54,43 @@ export default function OnboardingPage() {
   const [managerData, setManagerData] = useState({
     email: "",
   });
+
+  // User search state
+  const [searchEmail, setSearchEmail] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<ApiUser[]>([]);
+  const [selectedUser, setSelectedUser] = useState<ApiUser | null>(null);
+
+  // Search for users
+  const handleSearchUsers = async () => {
+    if (!searchEmail.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await searchUsers(searchEmail);
+      setSearchResults(response.data.users);
+
+      if (response.data.users.length === 0) {
+        toast({
+          title: "No users found",
+          description: "No verified users found with that email",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Search users error:", error);
+      toast({
+        title: "Search failed",
+        description: "Could not search for users",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   const handleCreateWarehouse = async () => {
     setIsLoading(true);
@@ -120,32 +157,26 @@ export default function OnboardingPage() {
       return;
     }
 
+    if (!selectedUser) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a user to add as manager",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // Validate email
-      if (!managerData.email) {
-        toast({
-          title: "Validation Error",
-          description: "Manager email is required",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      // For demo: Using the second user in database (yashnimse92@gmail.com)
-      // In production, you'd have a user search/invite system
-      const managerId = "cmi9vntih0000acv5ig1zvom2"; // yashnimse92@gmail.com
-
       // Add manager to warehouse
       await addWarehouseMember(createdWarehouseId, {
-        userId: managerId,
+        userId: selectedUser.id,
         role: "MANAGER",
       });
 
       toast({
         title: "Success!",
-        description: `Manager invited successfully`,
+        description: `Manager invited successfully. An email has been sent to ${selectedUser.email}`,
       });
 
       setStep(3);
@@ -153,11 +184,21 @@ export default function OnboardingPage() {
       console.error("Add manager error:", error);
 
       if (error instanceof APIError) {
-        toast({
-          title: "Failed to add manager",
-          description: error.message,
-          variant: "destructive",
-        });
+        // Check for specific error code
+        if ((error as any).data?.code === "ALREADY_IN_WAREHOUSE") {
+          const existingWarehouse = (error as any).data?.existingWarehouse;
+          toast({
+            title: "User already in warehouse",
+            description: `This user is already a member of "${existingWarehouse?.name}". They must leave that warehouse first.`,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Failed to add manager",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
       } else {
         toast({
           title: "Error",
@@ -185,11 +226,6 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen bg-linear-to-br from-background via-secondary/20 to-background p-4 md:p-8">
       <div className="max-w-5xl mx-auto pt-8 pb-24">
-        {/* Dev Login - Remove when auth is ready */}
-        <div className="max-w-md mx-auto mb-6">
-          <DevLogin />
-        </div>
-
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
@@ -473,38 +509,123 @@ export default function OnboardingPage() {
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <Label
-                  htmlFor="managerEmail"
+                  htmlFor="searchEmail"
                   className="flex items-center gap-2"
                 >
-                  <Mail className="h-4 w-4 text-primary" />
-                  Manager Email <span className="text-destructive">*</span>
+                  <Search className="h-4 w-4 text-primary" />
+                  Search User by Email
                 </Label>
-                <Input
-                  id="managerEmail"
-                  type="email"
-                  placeholder="manager@example.com"
-                  value={managerData.email}
-                  onChange={(e) =>
-                    setManagerData({ ...managerData, email: e.target.value })
-                  }
-                  className="h-11"
-                  required
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="searchEmail"
+                    type="email"
+                    placeholder="Enter email to search..."
+                    value={searchEmail}
+                    onChange={(e) => setSearchEmail(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSearchUsers();
+                      }
+                    }}
+                    className="h-11"
+                  />
+                  <Button
+                    onClick={handleSearchUsers}
+                    disabled={isSearching || !searchEmail.trim()}
+                    className="h-11"
+                  >
+                    {isSearching ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Search className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  Note: For demo purposes, using yashnimse92@gmail.com as
-                  manager
+                  Search for registered and verified users
                 </p>
               </div>
+
+              {/* Search Results */}
+              {searchResults.length > 0 && (
+                <div className="space-y-2">
+                  <Label>Search Results</Label>
+                  <div className="border rounded-lg divide-y max-h-64 overflow-y-auto">
+                    {searchResults.map((user) => (
+                      <div
+                        key={user.id}
+                        className={`p-3 flex items-center justify-between hover:bg-secondary/50 cursor-pointer transition-colors ${
+                          selectedUser?.id === user.id
+                            ? "bg-primary/10 border-l-4 border-primary"
+                            : ""
+                        }`}
+                        onClick={() => setSelectedUser(user)}
+                      >
+                        <div className="flex-1">
+                          <div className="font-medium">
+                            {user.name || user.email}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {user.email}
+                          </div>
+                          {user.warehouseMemberships &&
+                            user.warehouseMemberships.length > 0 && (
+                              <div className="text-xs text-destructive mt-1">
+                                ⚠️ Already member of:{" "}
+                                {user.warehouseMemberships[0].warehouse.name}
+                              </div>
+                            )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">{user.role}</Badge>
+                          {selectedUser?.id === user.id && (
+                            <CheckCircle2 className="h-5 w-5 text-primary" />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Selected User Display */}
+              {selectedUser && (
+                <div className="bg-primary/5 border border-primary/20 p-4 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5" />
+                    <div className="flex-1">
+                      <div className="font-medium">Selected Manager</div>
+                      <div className="text-sm text-muted-foreground">
+                        {selectedUser.email}
+                      </div>
+                      {selectedUser.name && (
+                        <div className="text-sm text-muted-foreground">
+                          {selectedUser.name}
+                        </div>
+                      )}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedUser(null)}
+                    >
+                      Change
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               <div className="bg-primary/5 border border-primary/20 p-4 rounded-lg">
                 <p className="text-sm text-muted-foreground flex items-start gap-2">
                   <Mail className="h-4 w-4 text-primary mt-0.5" />
                   <span>
-                    The manager will be added to your warehouse with full
-                    management permissions to oversee operations and manage
-                    employees.
+                    The selected user will be added as a warehouse manager with
+                    full management permissions. They will receive an email
+                    notification.
                   </span>
                 </p>
               </div>
+
               <div className="flex gap-3">
                 <Button
                   variant="outline"
@@ -520,7 +641,7 @@ export default function OnboardingPage() {
                   className="flex-1 h-12 text-base"
                   size="lg"
                   onClick={handleInviteManager}
-                  disabled={!managerData.email || isLoading}
+                  disabled={!selectedUser || isLoading}
                 >
                   {isLoading && (
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />

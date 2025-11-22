@@ -5,16 +5,22 @@ import type { AuthTypes } from "~/types/auth.types";
 
 async function requireAuth(req: Request, res: Response, next: NextFunction) {
   try {
+    // Check for token in Authorization header or cookie
     const authHeader = req.headers.authorization;
+    let token: string | undefined;
 
-    if (!authHeader?.startsWith("Bearer ")) {
+    if (authHeader?.startsWith("Bearer ")) {
+      token = authHeader.slice(7);
+    } else if (req.cookies?.accessToken) {
+      token = req.cookies.accessToken;
+    }
+
+    if (!token) {
       return res.status(401).json({
         success: false,
         message: "Authentication required.",
       });
     }
-
-    const token = authHeader.slice(7);
     const decoded = verifyAccessToken(token);
 
     if (!decoded || typeof decoded === "string") {

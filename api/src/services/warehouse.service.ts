@@ -8,6 +8,7 @@ import type {
     UpdateLocationDto,
 } from "../types/warehouse.types";
 import { UserRole } from "../generated/prisma/enums";
+import { sendWarehouseMemberAddedEmail } from "../lib/mailer";
 
 export class WarehouseService {
     /**
@@ -215,7 +216,7 @@ export class WarehouseService {
             throw error;
         }
 
-        return await prisma.warehouseMember.create({
+        const member = await prisma.warehouseMember.create({
             data: {
                 warehouseId,
                 userId: data.userId,
@@ -239,6 +240,24 @@ export class WarehouseService {
                 },
             },
         });
+
+        // Send notification email to the added member
+        try {
+            await sendWarehouseMemberAddedEmail(
+                member.user.email,
+                member.user.name,
+                member.warehouse.name,
+                member.warehouse.code,
+                data.role,
+                null // Will be enhanced later to include who added them
+            );
+            console.log(`📧 Warehouse member notification sent to ${member.user.email}`);
+        } catch (emailError) {
+            console.error("❌ Failed to send warehouse member notification:", emailError);
+            // Don't throw error - member addition was successful
+        }
+
+        return member;
     }
 
     /**

@@ -39,7 +39,7 @@ import {
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: true,
+  sameSite: "lax" as const,
   maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
 };
 
