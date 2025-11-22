@@ -1,6 +1,4 @@
-import { password } from "bun";
 import z from "zod";
-import { UserRole } from "~/generated/prisma/enums";
 
 export namespace AuthTypes {
   export type AuthRoles = "owner" | "manager" | "staff";

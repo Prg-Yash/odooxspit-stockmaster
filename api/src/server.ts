@@ -1,24 +1,26 @@
-import { env } from "./env";
-
+import "dotenv/config";
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import { userRouter } from "./routes/user.route";
+import { initializeMailer } from "./lib/mailer";
 
 const app = express();
 
 app.use(helmet());
 app.use(
   cors({
-    origin: env.CORS_ORIGIN.split(",") || "http://localhost:3000",
+    origin: process.env.CORS_ORIGIN || "http://localhost:3000",
     credentials: true,
   })
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+initializeMailer();
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -51,7 +53,7 @@ app.get("/health", (req, res) => {
 });
 
 // routes
-app.use("/auth", userRouter)
+app.use("/auth", userRouter);
 
 // 404 handler
 app.use((req, res) => {
@@ -78,8 +80,8 @@ app.use(
 );
 
 // Start server
-app.listen(env.PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${env.PORT}`);
+app.listen(process.env.PORT, () => {
+  console.log(`🚀 Server is running on http://localhost:${process.env.PORT}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || "development"}`);
   console.log(`📧 SMTP configured: ${process.env.SMTP_USER ? "Yes" : "No"}`);
 });
