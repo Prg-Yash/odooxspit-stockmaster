@@ -40,20 +40,24 @@ function initializeMailer() {
  */
 async function sendEmail(to: string, subject: string, html: string) {
   if (!transporter) {
-    console.warn("Email not sent - transporter not initialized");
+    console.error("❌ Email not sent - transporter not initialized");
     return false;
   }
 
   try {
-    await transporter.sendMail({
+    console.log(`📧 Sending email to: ${to}`);
+    console.log(`📧 Subject: ${subject}`);
+    const info = await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to,
       subject,
       html,
     });
+    console.log(`✅ Email sent successfully! Message ID: ${info.messageId}`);
     return true;
   } catch (error: any) {
-    console.error("Error sending email:", error.message ?? "unexpected error");
+    console.error("❌ Error sending email:", error.message ?? "unexpected error");
+    console.error("Full error:", error);
     return false;
   }
 }
@@ -195,9 +199,9 @@ async function sendWelcomeEmail(email: string, name: string) {
 }
 
 /**
- * Send password reset OTP email
+ * Send OTP email for password reset
  */
-async function sendPasswordResetOTP(email: string, otp: string) {
+async function sendPasswordResetOTPEmail(email: string, otp: string) {
   const html = `
     <!DOCTYPE html>
     <html>
@@ -209,48 +213,48 @@ async function sendPasswordResetOTP(email: string, otp: string) {
         .content { background-color: #f9f9f9; padding: 30px; }
         .otp-box { 
           background-color: #fff; 
-          border: 2px solid #FF5722; 
-          border-radius: 8px; 
-          padding: 20px; 
+          border: 2px dashed #FF5722; 
+          padding: 30px; 
           text-align: center; 
-          margin: 20px 0; 
+          margin: 20px 0;
+          border-radius: 10px;
         }
         .otp-code { 
-          font-size: 32px; 
+          font-size: 36px; 
           font-weight: bold; 
           color: #FF5722; 
-          letter-spacing: 8px; 
+          letter-spacing: 8px;
           font-family: 'Courier New', monospace;
         }
         .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
         .warning { background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }
-        .info { background-color: #d1ecf1; border-left: 4px solid #17a2b8; padding: 15px; margin: 20px 0; }
+        .info { background-color: #e3f2fd; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0; }
       </style>
     </head>
     <body>
       <div class="container">
         <div class="header">
-          <h1>Password Reset OTP</h1>
+          <h1>🔐 Password Reset OTP</h1>
         </div>
         <div class="content">
-          <h2>Your Password Reset Code</h2>
-          <p>We received a request to reset your password. Use the OTP code below to proceed:</p>
+          <h2>Your One-Time Password</h2>
+          <p>We received a request to reset your password. Use the OTP below to proceed:</p>
           
           <div class="otp-box">
             <div class="otp-code">${otp}</div>
           </div>
-          
+
           <div class="info">
-            <strong>ℹ️ Instructions:</strong>
-            <ol style="margin: 10px 0; padding-left: 20px;">
-              <li>Enter this code in the verification page</li>
-              <li>The code is valid for 10 minutes</li>
-              <li>You have up to 5 attempts to enter the correct code</li>
-            </ol>
+            <strong>📌 Important:</strong>
+            <ul style="margin: 10px 0; padding-left: 20px;">
+              <li>This OTP is valid for <strong>10 minutes</strong></li>
+              <li>You have <strong>5 attempts</strong> to enter the correct OTP</li>
+              <li>Do not share this code with anyone</li>
+            </ul>
           </div>
-          
+
           <div class="warning">
-            <strong>⚠️ Security Notice:</strong> If you didn't request a password reset, please ignore this email. Your password will remain unchanged. Never share this code with anyone.
+            <strong>⚠️ Security Notice:</strong> If you didn't request a password reset, please ignore this email and ensure your account is secure. Your password will remain unchanged.
           </div>
         </div>
         <div class="footer">
@@ -270,5 +274,5 @@ export {
   sendVerificationEmail,
   sendPasswordResetEmail,
   sendWelcomeEmail,
-  sendPasswordResetOTP,
+  sendPasswordResetOTPEmail,
 };
